@@ -22,3 +22,56 @@
     animation: none;
   }
 }
+
+/* Tradeske marketing page styles are deliberately scoped so the imported
+   landing design does not override the trading dashboard's theme tokens. */
+@keyframes tradeske-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes tradeske-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.tradeske-landing {
+  color-scheme: dark;
+}
+
+.tradeske-marquee {
+  animation: tradeske-marquee 40s linear infinite;
+}
+
+.tradeske-caret {
+  animation: tradeske-caret 1s steps(2, start) infinite;
+}
+
+.tradeske-glow {
+  box-shadow:
+    0 0 0 1px rgb(52 211 153 / 0.25),
+    0 18px 60px -18px rgb(52 211 153 / 0.45);
+}
+
+.tradeske-surface-card {
+  border: 1px solid rgb(51 65 85);
+  background: linear-gradient(160deg, rgb(30 41 59 / 0.92), rgb(15 23 42 / 0.9));
+}
+
+.tradeske-grid-glow {
+  background:
+    radial-gradient(70% 55% at 50% 0%, rgb(52 211 153 / 0.16), transparent 70%),
+    radial-gradient(50% 40% at 85% 20%, rgb(56 189 248 / 0.14), transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tradeske-marquee,
+  .tradeske-caret {
+    animation: none;
+  }
+}
