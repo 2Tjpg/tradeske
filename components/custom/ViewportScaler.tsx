@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useLayoutEffect, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 const MIN_SCALE = 0.5;
 const LG_BREAKPOINT = 1024; // matches Tailwind's `lg`
@@ -11,10 +12,16 @@ type ScaleState = number | false | null;
 // number = mobile viewport   → transform: scale(n)
 
 export default function ViewportScaler({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const shouldScale = pathname === '/trade' || pathname === '/reports';
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState<ScaleState>(null);
 
   const updateScale = () => {
+    if (!shouldScale) {
+      setScale(false);
+      return;
+    }
     const el = containerRef.current;
     if (!el) return;
 
@@ -40,7 +47,7 @@ export default function ViewportScaler({ children }: { children: React.ReactNode
   useLayoutEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     updateScale();
-  }, []);
+  }, [shouldScale]);
 
   // React to content height changes (fonts loading, dynamic data, images)
   useEffect(() => {
@@ -49,7 +56,7 @@ export default function ViewportScaler({ children }: { children: React.ReactNode
     const ro = new ResizeObserver(() => updateScale());
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [shouldScale]);
 
   // Debounced window resize + orientation-change listener
   useEffect(() => {
@@ -65,9 +72,9 @@ export default function ViewportScaler({ children }: { children: React.ReactNode
       window.removeEventListener('resize', handler);
       window.removeEventListener('orientationchange', handler);
     };
-  }, []);
+  }, [shouldScale]);
 
-  const isMobile = typeof scale === 'number';
+  const isMobile = shouldScale && typeof scale === 'number';
   const isReady = scale !== null;
 
   // Desktop (or pre-measurement): plain passthrough container.
@@ -76,11 +83,11 @@ export default function ViewportScaler({ children }: { children: React.ReactNode
     return (
       <div
         ref={containerRef}
-        style={{
+        style={shouldScale ? {
           height: '100dvh',
           opacity: isReady ? 1 : 0,
           transition: 'opacity 0.15s ease',
-        }}
+        } : undefined}
       >
         {children}
       </div>
