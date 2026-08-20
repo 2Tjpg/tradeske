@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { buildFaviconUri } from '@/lib/build-favicon-uri';
 import { getLogoSrc } from '@/lib/get-logo-src';
 import { inter, FONT_CLASS_MAP } from '@/lib/fonts';
@@ -17,6 +17,12 @@ export function generateMetadata(): Metadata {
     ...(faviconUri ? { icons: { icon: faviconUri } } : {}),
   };
 }
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
 
 const fontClass =
   FONT_CLASS_MAP[process.env.NEXT_PUBLIC_FONT_FAMILY ?? 'Inter'] ??
