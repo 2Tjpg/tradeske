@@ -41,7 +41,11 @@ export default function ReportsPage() {
   const { localize } = useAppTranslations();
   const { ws, isConnected, isExhausted, auth } = useDerivWSContext();
   const { authState, accounts, activeAccount, login, signUp, logout, switchAccount } = auth;
-  const trading = useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated: !!auth.wsUrl, onAuthWSFailed: logout });
+  const handleLogout = () => {
+    logout();
+    router.replace('/');
+  };
+  const trading = useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated: !!auth.wsUrl, onAuthWSFailed: handleLogout });
   const digitContractLabels = getDigitContractLabels(localize);
 
   useEffect(() => {
@@ -66,7 +70,7 @@ export default function ReportsPage() {
         activeAccount={activeAccount}
         onLogin={login}
         onSignUp={signUp}
-        onLogout={logout}
+        onLogout={handleLogout}
         onSwitchAccount={switchAccount}
         logoSrc={logoSrc}
         actions={<ThemeToggle />}

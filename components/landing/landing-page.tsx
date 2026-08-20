@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ArrowDownToLine,
@@ -18,7 +18,6 @@ import { Button } from '@/components/ui/button';
 import { LandingHeader } from '@/components/landing/header';
 import { ReviewMarquee } from '@/components/landing/review-marquee';
 import { Typewriter } from '@/components/landing/typewriter';
-import { TRADESKE_SIGNUP_URL } from '@/lib/tradeske-config';
 
 const STEPS = [
   { icon: Link2, title: 'Connect', text: 'Create and link your Deriv account.' },
@@ -47,7 +46,7 @@ const STEPS = [
 export function TradeskeLandingPage() {
   const router = useRouter();
   const { auth } = useDerivWSContext();
-  const { authState, login } = auth;
+  const { authState, login, signUp } = auth;
   const isAuthenticating = authState === 'authenticating';
 
   useEffect(() => {
@@ -69,7 +68,7 @@ export function TradeskeLandingPage() {
 
   return (
     <main id="top" className="tradeske-landing min-h-dvh overflow-x-hidden bg-slate-950 text-slate-50">
-      <LandingHeader onLogin={login} isAuthenticating={isAuthenticating} />
+      <LandingHeader onLogin={login} onSignUp={signUp} isAuthenticating={isAuthenticating} />
 
       <section className="tradeske-grid-glow relative overflow-hidden">
         <div className="mx-auto max-w-3xl px-4 pb-14 pt-12 text-center sm:px-6 sm:pb-20 sm:pt-16">
@@ -98,10 +97,15 @@ export function TradeskeLandingPage() {
           </p>
 
           <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-            <Button asChild size="lg" className="tradeske-glow bg-emerald-400 px-7 text-base font-semibold text-emerald-950 hover:bg-emerald-300">
-              <a href={TRADESKE_SIGNUP_URL} target="_blank" rel="noopener noreferrer">
-                Get Started
-              </a>
+            <Button
+              type="button"
+              size="lg"
+              className="tradeske-glow bg-emerald-400 px-7 text-base font-semibold text-emerald-950 hover:bg-emerald-300"
+              disabled={isAuthenticating}
+              onClick={() => void signUp()}
+            >
+              {isAuthenticating && <LoaderCircle className="animate-spin" />}
+              {isAuthenticating ? 'Opening signup…' : 'Get Started'}
             </Button>
             <Button
               type="button"
@@ -192,10 +196,15 @@ export function TradeskeLandingPage() {
             Ready to simplify your digit strategy?
           </h2>
           <div className="mt-8">
-            <Button asChild size="lg" className="tradeske-glow bg-emerald-400 px-9 py-6 text-base font-semibold text-emerald-950 hover:bg-emerald-300">
-              <a href={TRADESKE_SIGNUP_URL} target="_blank" rel="noopener noreferrer">
-                Let's Get Started
-              </a>
+            <Button
+              type="button"
+              size="lg"
+              className="tradeske-glow bg-emerald-400 px-9 py-6 text-base font-semibold text-emerald-950 hover:bg-emerald-300"
+              disabled={isAuthenticating}
+              onClick={() => void signUp()}
+            >
+              {isAuthenticating && <LoaderCircle className="animate-spin" />}
+              {isAuthenticating ? 'Opening signup…' : "Let's Get Started"}
             </Button>
           </div>
           <p className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400">

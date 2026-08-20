@@ -3,14 +3,13 @@
 import { useState } from 'react';
 import { Activity, LoaderCircle, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { TRADESKE_SIGNUP_URL } from '@/lib/tradeske-config';
-
 interface LandingHeaderProps {
   onLogin: () => Promise<void>;
+  onSignUp: () => Promise<void>;
   isAuthenticating: boolean;
 }
 
-export function LandingHeader({ onLogin, isAuthenticating }: LandingHeaderProps) {
+export function LandingHeader({ onLogin, onSignUp, isAuthenticating }: LandingHeaderProps) {
   const [open, setOpen] = useState(false);
 
   const loginLabel = isAuthenticating ? 'Connecting…' : 'Login';
@@ -36,10 +35,14 @@ export function LandingHeader({ onLogin, isAuthenticating }: LandingHeaderProps)
             {isAuthenticating && <LoaderCircle className="animate-spin" />}
             {loginLabel}
           </Button>
-          <Button asChild className="bg-emerald-400 font-semibold text-emerald-950 hover:bg-emerald-300">
-            <a href={TRADESKE_SIGNUP_URL} target="_blank" rel="noopener noreferrer">
-              Sign Up
-            </a>
+          <Button
+            type="button"
+            className="bg-emerald-400 font-semibold text-emerald-950 hover:bg-emerald-300"
+            disabled={isAuthenticating}
+            onClick={() => void onSignUp()}
+          >
+            {isAuthenticating && <LoaderCircle className="animate-spin" />}
+            Sign Up
           </Button>
         </div>
 
@@ -66,10 +69,14 @@ export function LandingHeader({ onLogin, isAuthenticating }: LandingHeaderProps)
             {isAuthenticating && <LoaderCircle className="animate-spin" />}
             {loginLabel}
           </Button>
-          <Button asChild className="w-full bg-emerald-400 font-semibold text-emerald-950 hover:bg-emerald-300">
-            <a href={TRADESKE_SIGNUP_URL} target="_blank" rel="noopener noreferrer">
-              Sign Up
-            </a>
+          <Button
+            type="button"
+            className="w-full bg-emerald-400 font-semibold text-emerald-950 hover:bg-emerald-300"
+            disabled={isAuthenticating}
+            onClick={() => void onSignUp()}
+          >
+            {isAuthenticating && <LoaderCircle className="animate-spin" />}
+            Sign Up
           </Button>
         </div>
       )}

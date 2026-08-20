@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 /**
  * The real, functional Digits app (live WebSocket, real auth/trading), rendered
  * via DigitsView. Optionally takes a no-code `appConfig` to render the
@@ -35,17 +37,22 @@ export function LiveDigits({
   appName?: string;
   showAppName?: boolean;
 }) {
+  const router = useRouter();
   const providerLogo = useLogoSrc();
   const logoSrc = logoSrcOverride ?? providerLogo;
   const { ws, isConnected, isExhausted, auth } = useDerivWSContext();
   const { authState, accounts, activeAccount, login, signUp, logout, switchAccount } = auth;
+  const handleLogout = () => {
+    logout();
+    router.replace('/');
+  };
 
   const trading = useDigitsTrading({
     ws,
     isConnected,
     isExhausted,
     isAuthenticated: !!auth.wsUrl,
-    onAuthWSFailed: logout,
+    onAuthWSFailed: handleLogout,
   });
 
   return (
@@ -55,7 +62,7 @@ export function LiveDigits({
       activeAccount={activeAccount}
       onLogin={login}
       onSignUp={signUp}
-      onLogout={logout}
+      onLogout={handleLogout}
       onSwitchAccount={switchAccount}
       logoSrc={logoSrc}
       appName={appName}
