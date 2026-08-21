@@ -771,8 +771,8 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
     const variants: Record<StyleVariant, () => React.ReactNode> = {
       // a — bordered box (current)
       a: () => (
-        <div className="space-y-1.5 rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-100 sm:space-y-2 sm:p-3">
-          <p className="mb-0 text-[11px] text-slate-300 sm:mb-1 sm:text-xs">
+        <div className="space-y-1.5 rounded-lg border border-border bg-card p-2 text-card-foreground sm:space-y-2 sm:p-3">
+          <p className="mb-0 text-[11px] text-muted-foreground sm:mb-1 sm:text-xs">
             <Localize i18n_default_text="Prediction" />
           </p>
           <p className="text-xs font-medium sm:text-sm">
@@ -788,8 +788,8 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
             )}
           </p>
           {(activeProposal || activeProposalLoading) && (
-            <div className="flex items-center justify-between border-t border-slate-700 pt-1">
-              <span className="text-xs text-slate-300">
+            <div className="flex items-center justify-between border-t border-border pt-1">
+              <span className="text-xs text-muted-foreground">
                 <Localize i18n_default_text="Payout" />
               </span>
               {payoutEl}
