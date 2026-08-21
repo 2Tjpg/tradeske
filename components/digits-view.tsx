@@ -333,7 +333,7 @@ export function DigitsView({
               <Card className="shrink-0 border shadow-sm mb-12">
                 <CardContent className="flex flex-col p-3 pt-3 sm:p-6 sm:pt-4 pb-2 sm:pb-6">
                   <div
-                    className={`lg:grid lg:overflow-visible ${tradeType !== 'even-odd' ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}
+                    className="lg:grid lg:grid-cols-3 lg:overflow-visible"
                   >
                     {/* Column 1: Symbol selector + tick display */}
                     <div className="flex flex-col pb-4 pt-1 sm:pb-6 sm:pt-2 lg:py-0 lg:pr-6">
@@ -354,17 +354,15 @@ export function DigitsView({
 
                     {/* Columns 2+3 wrapper: stacked on mobile, transparent on desktop */}
                     <div className="max-lg:border-t max-lg:divide-y divide-border lg:contents">
-                      {/* Column 2: Digit stats — hidden for Even/Odd */}
-                      {tradeType !== 'even-odd' && (
-                        <div className="py-4 sm:py-6 lg:py-0 lg:px-6 lg:border-l lg:border-border">
-                          <DigitStatsBar
-                            digitStats={digitStats}
-                            selectedDigit={selectedDigit}
-                            liveDigit={lastDigit}
-                            onDigitSelect={setSelectedDigit}
-                          />
-                        </div>
-                      )}
+                      {/* Column 2: Shared digit statistics and live tick cursor */}
+                      <div className="py-4 sm:py-6 lg:py-0 lg:px-6 lg:border-l lg:border-border">
+                        <DigitStatsBar
+                          digitStats={digitStats}
+                          selectedDigit={selectedDigit}
+                          liveDigit={lastDigit}
+                          onDigitSelect={setSelectedDigit}
+                        />
+                      </div>
 
                       {/* Column 3: Trade controls */}
                       <div className="pt-4 sm:pt-6 lg:pt-0 lg:pl-6 lg:border-l lg:border-border">

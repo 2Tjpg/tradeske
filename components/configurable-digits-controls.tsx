@@ -426,9 +426,8 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
 
   // ── Digit stats + digit selection (3 styles) ────────────────────────────
   // Real control = DigitStatsBar (includes digit selection). All variants keep
-  // onDigitSelect / selectedDigit, and digit stats only show for non-even/odd.
+  // onDigitSelect / selectedDigit, and the live cursor is shared by every digit trade type.
   const renderDigitStats = () => {
-    if (tradeType === 'even-odd') return null;
     const maxPct = Math.max(...digitStats.percentages);
     const minPct = Math.min(...digitStats.percentages);
 
