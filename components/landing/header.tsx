@@ -5,11 +5,11 @@ import { Activity, LoaderCircle, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 interface LandingHeaderProps {
   onLogin: () => Promise<void>;
-  onSignUp: () => Promise<void>;
+  signUpUrl: string;
   isAuthenticating: boolean;
 }
 
-export function LandingHeader({ onLogin, onSignUp, isAuthenticating }: LandingHeaderProps) {
+export function LandingHeader({ onLogin, signUpUrl, isAuthenticating }: LandingHeaderProps) {
   const [open, setOpen] = useState(false);
 
   const loginLabel = isAuthenticating ? 'Connecting…' : 'Login';
@@ -36,13 +36,12 @@ export function LandingHeader({ onLogin, onSignUp, isAuthenticating }: LandingHe
             {loginLabel}
           </Button>
           <Button
-            type="button"
+            asChild
             className="bg-emerald-400 font-semibold text-emerald-950 hover:bg-emerald-300"
-            disabled={isAuthenticating}
-            onClick={() => void onSignUp()}
           >
-            {isAuthenticating && <LoaderCircle className="animate-spin" />}
-            Sign Up
+            <a href={signUpUrl} target="_blank" rel="noopener noreferrer">
+              Sign Up
+            </a>
           </Button>
         </div>
 
@@ -70,13 +69,12 @@ export function LandingHeader({ onLogin, onSignUp, isAuthenticating }: LandingHe
             {loginLabel}
           </Button>
           <Button
-            type="button"
+            asChild
             className="w-full bg-emerald-400 font-semibold text-emerald-950 hover:bg-emerald-300"
-            disabled={isAuthenticating}
-            onClick={() => void onSignUp()}
           >
-            {isAuthenticating && <LoaderCircle className="animate-spin" />}
-            Sign Up
+            <a href={signUpUrl} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+              Sign Up
+            </a>
           </Button>
         </div>
       )}
