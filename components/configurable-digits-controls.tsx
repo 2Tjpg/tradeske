@@ -439,6 +439,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           selectedDigit={selectedDigit}
           liveDigit={lastDigit}
           onDigitSelect={onDigitSelect}
+          readOnly={tradeType === 'even-odd'}
         />
       ),
       // Compact grid of 0–9 selectable <Button>s, each with its percentage.
@@ -449,7 +450,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           </span>
           <div className="grid grid-cols-5 gap-1.5">
             {digitStats.percentages.map((pct, digit) => {
-              const isSelected = digit === selectedDigit;
+              const isSelected = tradeType !== 'even-odd' && digit === selectedDigit;
               const isLive = digit === lastDigit;
               const isHighest = digitStats.totalTicks > 0 && pct === maxPct;
               const isLowest = digitStats.totalTicks > 0 && pct === minPct;
@@ -457,10 +458,13 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
                 <Button
                   key={digit}
                   variant={isSelected ? 'default' : 'outline'}
-                  onClick={() => onDigitSelect(digit)}
+                  onClick={tradeType === 'even-odd' ? undefined : () => onDigitSelect(digit)}
+                  aria-disabled={tradeType === 'even-odd'}
+                  tabIndex={tradeType === 'even-odd' ? -1 : undefined}
                   className={cn(
                     'flex h-12 flex-col items-center justify-center gap-0 rounded-lg p-0 transition-all duration-150',
                     !isSelected && 'bg-muted/50 border-muted-foreground/20',
+                    tradeType === 'even-odd' && 'pointer-events-none',
                     isLive && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
                   )}
                 >
@@ -493,7 +497,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           </span>
           <div className="flex flex-col gap-1">
             {digitStats.percentages.map((pct, digit) => {
-              const isSelected = digit === selectedDigit;
+              const isSelected = tradeType !== 'even-odd' && digit === selectedDigit;
               const isLive = digit === lastDigit;
               const isHighest = digitStats.totalTicks > 0 && pct === maxPct;
               const isLowest = digitStats.totalTicks > 0 && pct === minPct;
@@ -501,10 +505,13 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
                 <Button
                   key={digit}
                   variant={isSelected ? 'default' : 'outline'}
-                  onClick={() => onDigitSelect(digit)}
+                  onClick={tradeType === 'even-odd' ? undefined : () => onDigitSelect(digit)}
+                  aria-disabled={tradeType === 'even-odd'}
+                  tabIndex={tradeType === 'even-odd' ? -1 : undefined}
                   className={cn(
                     'flex h-8 w-full items-center justify-between px-3 text-sm font-medium transition-all duration-150',
                     !isSelected && 'bg-muted/50 border-muted-foreground/20',
+                    tradeType === 'even-odd' && 'pointer-events-none',
                     isLive && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
                   )}
                 >

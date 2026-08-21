@@ -361,6 +361,7 @@ export function DigitsView({
                           selectedDigit={selectedDigit}
                           liveDigit={lastDigit}
                           onDigitSelect={setSelectedDigit}
+                          readOnly={tradeType === 'even-odd'}
                         />
                       </div>
 
