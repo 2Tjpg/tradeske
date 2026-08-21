@@ -138,6 +138,27 @@ export function TradeControls({
   }, [buyResult, onClearBuyResult, localize]);
 
   const modeOptions = getContractModeOptions(localize)[tradeType];
+  const isMatchesDiffers = tradeType === 'matches-differs';
+  const activeProposal = isMatchesDiffers
+    ? contractMode === 'DIGITMATCH'
+      ? matchesProposal
+      : differsProposal
+    : proposal;
+  const activeProposalLoading = isMatchesDiffers
+    ? contractMode === 'DIGITMATCH'
+      ? isMatchesProposalLoading
+      : isDiffersProposalLoading
+    : isProposalLoading;
+  const buyActiveContract = () => {
+    if (isMatchesDiffers) {
+      onBuyMode(contractMode === 'DIGITMATCH' ? 'DIGITMATCH' : 'DIGITDIFF');
+    } else {
+      onBuy();
+    }
+  };
+  const buyLabel = isBuying
+    ? localize('Purchasing...')
+    : localize('Buy @ {{stake}} USD', { stake: (parseFloat(stake) || 0).toFixed(2) });
 
   return (
     <div className="space-y-2 sm:space-y-4">
@@ -198,7 +219,7 @@ export function TradeControls({
         </div>
       </div>
 
-      <div className="rounded-lg border border-border p-2 sm:p-3 bg-muted/20 space-y-1.5 sm:space-y-2">
+      <div className="space-y-1.5 rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-100 sm:space-y-2 sm:p-3">
         <p className="text-[11px] sm:text-xs text-muted-foreground mb-0 sm:mb-1">
           <Localize i18n_default_text="Prediction" />
         </p>
@@ -216,63 +237,31 @@ export function TradeControls({
             </>
           )}
         </p>
-        {(proposal || isProposalLoading) && (
-          <div className="flex items-center justify-between pt-1 border-t border-border">
-            <span className="text-xs text-muted-foreground">
+        {(activeProposal || activeProposalLoading) && (
+          <div className="flex items-center justify-between border-t border-slate-700 pt-1">
+            <span className="text-xs text-slate-300">
               <Localize i18n_default_text="Payout" />
             </span>
-            {isProposalLoading ? (
+            {activeProposalLoading ? (
               <Skeleton className="h-4 w-24" />
             ) : (
               <span className="text-sm font-bold text-foreground">
-                {proposal!.payout.toFixed(2)} USD
+                {activeProposal!.payout.toFixed(2)} USD
               </span>
             )}
           </div>
         )}
       </div>
 
-      {/* Direct Matches/Differs actions use their own live proposal. */}
+      {/* Single buy action follows the selected contract toggle. */}
       <div className="max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static">
-        {tradeType === 'matches-differs' ? (
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              className="h-10 rounded-full px-2 text-xs sm:h-11 sm:px-3 sm:text-sm"
-              disabled={!isConnected || !matchesProposal || isBuying}
-              onClick={() => onBuyMode('DIGITMATCH')}
-            >
-              {isBuying || isMatchesProposalLoading
-                ? localize('Loading...')
-                : matchesProposal
-                  ? localize('Matches @ {{price}} USD', { price: matchesProposal.askPrice.toFixed(2) })
-                  : localize('Matches')}
-            </Button>
-            <Button
-              variant="secondary"
-              className="h-10 rounded-full px-2 text-xs sm:h-11 sm:px-3 sm:text-sm"
-              disabled={!isConnected || !differsProposal || isBuying}
-              onClick={() => onBuyMode('DIGITDIFF')}
-            >
-              {isBuying || isDiffersProposalLoading
-                ? localize('Loading...')
-                : differsProposal
-                  ? localize('Differs @ {{price}} USD', { price: differsProposal.askPrice.toFixed(2) })
-                  : localize('Differs')}
-            </Button>
-          </div>
-        ) : (
-          <Button
-            className="w-full h-10 rounded-full px-6 sm:h-11 sm:px-8"
-            disabled={!isConnected || !proposal || isBuying}
-            onClick={onBuy}
-          >
-            {isBuying
-              ? localize('Purchasing...')
-              : proposal
-                ? localize('Buy @ {{price}} USD', { price: proposal.askPrice.toFixed(2) })
-                : localize('Buy Contract')}
-          </Button>
-        )}
+        <Button
+          className="h-10 w-full rounded-full px-6 sm:h-11 sm:px-8"
+          disabled={!isConnected || !activeProposal || isBuying}
+          onClick={buyActiveContract}
+        >
+          {buyLabel}
+        </Button>
       </div>
 
       {isAuthenticated && (

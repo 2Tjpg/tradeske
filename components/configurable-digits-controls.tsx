@@ -742,20 +742,31 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   const renderPrediction = () => {
     const predictionText = getPredictionText(contractMode, localize);
     const showDigit = showDigitInPrediction(contractMode);
+    const isMatchesDiffers = tradeType === 'matches-differs';
+    const activeProposal = isMatchesDiffers
+      ? contractMode === 'DIGITMATCH'
+        ? matchesProposal
+        : differsProposal
+      : proposal;
+    const activeProposalLoading = isMatchesDiffers
+      ? contractMode === 'DIGITMATCH'
+        ? isMatchesProposalLoading
+        : isDiffersProposalLoading
+      : isProposalLoading;
     const payoutEl =
-      proposal || isProposalLoading ? (
-        isProposalLoading ? (
+      activeProposal || activeProposalLoading ? (
+        activeProposalLoading ? (
           <Skeleton className="h-4 w-24" />
         ) : (
-          <span className="text-sm font-bold text-foreground">{proposal!.payout.toFixed(2)} USD</span>
+          <span className="text-sm font-bold text-foreground">{activeProposal!.payout.toFixed(2)} USD</span>
         )
       ) : null;
 
     const variants: Record<StyleVariant, () => React.ReactNode> = {
       // a — bordered box (current)
       a: () => (
-        <div className="space-y-1.5 rounded-lg border border-border bg-muted/20 p-2 sm:space-y-2 sm:p-3">
-          <p className="mb-0 text-[11px] text-muted-foreground sm:mb-1 sm:text-xs">
+        <div className="space-y-1.5 rounded-lg border border-slate-700 bg-slate-800 p-2 text-slate-100 sm:space-y-2 sm:p-3">
+          <p className="mb-0 text-[11px] text-slate-300 sm:mb-1 sm:text-xs">
             <Localize i18n_default_text="Prediction" />
           </p>
           <p className="text-xs font-medium sm:text-sm">
@@ -770,9 +781,9 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
               </>
             )}
           </p>
-          {(proposal || isProposalLoading) && (
-            <div className="flex items-center justify-between border-t border-border pt-1">
-              <span className="text-xs text-muted-foreground">
+          {(activeProposal || activeProposalLoading) && (
+            <div className="flex items-center justify-between border-t border-slate-700 pt-1">
+              <span className="text-xs text-slate-300">
                 <Localize i18n_default_text="Payout" />
               </span>
               {payoutEl}
@@ -827,42 +838,23 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   // ── Buy (3 styles, themed) ──────────────────────────────────────────────
   // Real control = the <Button>.
   const renderBuy = () => {
-    if (tradeType === 'matches-differs') {
-      return (
-        <div className="grid grid-cols-2 gap-2">
-          <Button
-            className="h-10 flex-1 rounded-full px-2 text-xs sm:h-11 sm:px-3 sm:text-sm"
-            disabled={!isConnected || !matchesProposal || isBuying}
-            onClick={() => onBuyMode('DIGITMATCH')}
-          >
-            {isBuying || isMatchesProposalLoading
-              ? localize('Loading...')
-              : matchesProposal
-                ? localize('Matches @ {{price}} USD', { price: matchesProposal.askPrice.toFixed(2) })
-                : localize('Matches')}
-          </Button>
-          <Button
-            variant="secondary"
-            className="h-10 flex-1 rounded-full px-2 text-xs sm:h-11 sm:px-3 sm:text-sm"
-            disabled={!isConnected || !differsProposal || isBuying}
-            onClick={() => onBuyMode('DIGITDIFF')}
-          >
-            {isBuying || isDiffersProposalLoading
-              ? localize('Loading...')
-              : differsProposal
-                ? localize('Differs @ {{price}} USD', { price: differsProposal.askPrice.toFixed(2) })
-                : localize('Differs')}
-          </Button>
-        </div>
-      );
-    }
-
-    const disabled = !isConnected || !proposal || isBuying;
+    const isMatchesDiffers = tradeType === 'matches-differs';
+    const activeProposal = isMatchesDiffers
+      ? contractMode === 'DIGITMATCH'
+        ? matchesProposal
+        : differsProposal
+      : proposal;
+    const buyActiveContract = () => {
+      if (isMatchesDiffers) {
+        onBuyMode(contractMode === 'DIGITMATCH' ? 'DIGITMATCH' : 'DIGITDIFF');
+      } else {
+        onBuy();
+      }
+    };
+    const disabled = !isConnected || !activeProposal || isBuying;
     const label = isBuying
       ? localize('Purchasing...')
-      : proposal
-        ? localize('Buy @ {{price}} USD', { price: proposal.askPrice.toFixed(2) })
-        : localize('Buy Contract');
+      : localize('Buy @ {{stake}} USD', { stake: (parseFloat(stake) || 0).toFixed(2) });
 
     const variants: Record<StyleVariant, () => React.ReactNode> = {
       // a — pill (current)
@@ -870,7 +862,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         <Button
           className="h-10 w-full rounded-full px-6 sm:h-11 sm:px-8"
           disabled={disabled}
-          onClick={onBuy}
+          onClick={buyActiveContract}
         >
           {label}
         </Button>
@@ -880,7 +872,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         <Button
           className="h-14 w-full rounded-md bg-primary text-base font-bold text-primary-foreground hover:bg-primary/90"
           disabled={disabled}
-          onClick={onBuy}
+          onClick={buyActiveContract}
         >
           {label}
         </Button>
@@ -890,7 +882,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         <Button
           className="h-14 w-full rounded-xl bg-gradient-to-r from-primary to-primary/70 font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90"
           disabled={disabled}
-          onClick={onBuy}
+          onClick={buyActiveContract}
         >
           {label}
         </Button>
