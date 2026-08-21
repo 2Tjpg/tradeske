@@ -27,7 +27,7 @@ export function TradeTypeChips<T extends string>({
         const opt = options.find((o) => o.value === v);
         if (opt) onValueChange(opt.value);
       }}
-      className="w-max gap-1.5 sm:gap-2"
+      className="w-max min-w-max gap-1.5 sm:gap-2"
     >
       {options.map((opt) => (
         <ToggleGroupItem

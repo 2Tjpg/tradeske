@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Localize } from '@deriv-com/translations';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -89,6 +90,7 @@ export function Header({
   const shouldShowName = resolveShowAppName(showAppName);
   const logoLetter = resolvedName.charAt(0).toUpperCase() || 'D';
   const [accountSwitcherOpen, setAccountSwitcherOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isAuthenticated = authState === 'authenticated';
   const isAuthenticating = authState === 'authenticating';
 
@@ -114,9 +116,11 @@ export function Header({
           </h1>
         )}
       </div>
-      <div className="flex items-center gap-3">
-        {actions}
-        <LanguageSwitcher />
+      <div className="relative flex min-w-0 items-center gap-2 md:gap-3">
+        <div className="hidden items-center gap-3 md:flex">
+          {actions}
+          <LanguageSwitcher />
+        </div>
         {isAuthenticated && activeAccount && (
           <Popover open={accountSwitcherOpen} onOpenChange={setAccountSwitcherOpen}>
             <PopoverTrigger asChild>
@@ -167,24 +171,62 @@ export function Header({
             </PopoverContent>
           </Popover>
         )}
-        {isAuthenticated ? (
-          <Button variant="outline" onClick={onLogout}>
-            <Localize i18n_default_text="Log out" />
-          </Button>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={onLogin} disabled={isAuthenticating}>
-              {isAuthenticating ? (
-                <Localize i18n_default_text="Logging in..." />
-              ) : (
-                <Localize i18n_default_text="Log in" />
-              )}
+        <div className="hidden items-center gap-2 md:flex">
+          {isAuthenticated ? (
+            <Button variant="outline" onClick={onLogout}>
+              <Localize i18n_default_text="Log out" />
             </Button>
-            {onSignUp && (
-              <Button size="sm" onClick={onSignUp} disabled={isAuthenticating}>
-                <Localize i18n_default_text="Sign up" />
+          ) : (
+            <>
+              <Button variant="outline" size="sm" onClick={onLogin} disabled={isAuthenticating}>
+                {isAuthenticating ? (
+                  <Localize i18n_default_text="Logging in..." />
+                ) : (
+                  <Localize i18n_default_text="Log in" />
+                )}
               </Button>
-            )}
+              {onSignUp && (
+                <Button size="sm" onClick={onSignUp} disabled={isAuthenticating}>
+                  <Localize i18n_default_text="Sign up" />
+                </Button>
+              )}
+            </>
+          )}
+        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          className="shrink-0 md:hidden"
+          aria-label={localize(mobileMenuOpen ? 'Close menu' : 'Open menu')}
+          aria-expanded={mobileMenuOpen}
+          onClick={() => setMobileMenuOpen(open => !open)}
+        >
+          {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </Button>
+        {mobileMenuOpen && (
+          <div className="absolute right-0 top-full z-[100] mt-2 w-56 rounded-lg border border-border bg-popover p-2 shadow-lg md:hidden">
+            <div className="flex items-center justify-between gap-2 border-b border-border px-2 pb-2">
+              {actions}
+              <LanguageSwitcher />
+            </div>
+            <div className="pt-2">
+              {isAuthenticated ? (
+                <Button variant="outline" className="w-full justify-start" onClick={() => { onLogout(); setMobileMenuOpen(false); }}>
+                  <Localize i18n_default_text="Log out" />
+                </Button>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Button variant="outline" className="w-full" onClick={() => { onLogin(); setMobileMenuOpen(false); }} disabled={isAuthenticating}>
+                    {isAuthenticating ? <Localize i18n_default_text="Logging in..." /> : <Localize i18n_default_text="Log in" />}
+                  </Button>
+                  {onSignUp && (
+                    <Button className="w-full" onClick={() => { onSignUp(); setMobileMenuOpen(false); }} disabled={isAuthenticating}>
+                      <Localize i18n_default_text="Sign up" />
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

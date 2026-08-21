@@ -322,7 +322,7 @@ export function DigitsView({
             </>
           ) : (
             <>
-              <div className="shrink-0 overflow-x-auto pb-0.5 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+              <div className="-mx-3 shrink-0 overflow-x-auto px-3 pb-0.5 scroll-px-3 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0 sm:scroll-px-0">
                 <TradeTypeChips
                   value={tradeType}
                   options={digitTradeTypeOptions}
