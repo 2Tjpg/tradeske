@@ -549,7 +549,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
             <ToggleGroupItem
               key={opt.value}
               value={opt.value}
-              className="flex-1 rounded-full text-sm font-medium text-muted-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:font-bold data-[state=on]:shadow-sm hover:text-foreground"
+              className="flex-1 rounded-full text-sm font-medium text-muted-foreground data-[state=on]:bg-background data-[state=on]:!text-primary data-[state=on]:font-bold data-[state=on]:shadow-sm hover:text-foreground"
             >
               {opt.label}
             </ToggleGroupItem>
@@ -771,7 +771,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           </p>
           <p className="text-xs font-medium sm:text-sm">
             <Localize i18n_default_text="Last digit of the price will" />{' '}
-            <span className="text-primary font-bold">{predictionText}</span>
+            <span className="!text-primary font-bold">{predictionText}</span>
             {showDigit && (
               <>
                 {' '}
@@ -796,7 +796,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         <div className="flex items-center justify-between gap-2 text-xs sm:text-sm">
           <span className="font-medium">
             <Localize i18n_default_text="Last digit will" />{' '}
-            <span className="text-primary font-bold">{predictionText}</span>
+            <span className="!text-primary font-bold">{predictionText}</span>
             {showDigit && (
               <>
                 {' '}
@@ -814,7 +814,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         <div className="flex w-full items-center justify-between gap-2 rounded-md bg-muted/40 px-3 py-2 text-xs">
           <span className="font-medium">
             <Localize i18n_default_text="Will" />{' '}
-            <span className="text-primary font-bold">{predictionText}</span>
+            <span className="!text-primary font-bold">{predictionText}</span>
             {showDigit && (
               <>
                 {' '}

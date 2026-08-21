@@ -174,7 +174,7 @@ export function TradeControls({
           <ToggleGroupItem
             key={opt.value}
             value={opt.value}
-            className="flex-1 rounded-full text-sm font-medium text-muted-foreground data-[state=on]:bg-background data-[state=on]:text-primary data-[state=on]:font-bold data-[state=on]:shadow-sm hover:text-foreground"
+            className="flex-1 rounded-full text-sm font-medium text-muted-foreground data-[state=on]:bg-background data-[state=on]:!text-primary data-[state=on]:font-bold data-[state=on]:shadow-sm hover:text-foreground"
           >
             {opt.label}
           </ToggleGroupItem>
@@ -225,7 +225,7 @@ export function TradeControls({
         </p>
         <p className="text-xs sm:text-sm font-medium">
           <Localize i18n_default_text="Last digit of the price will" />{' '}
-          <span className="text-primary font-bold">
+          <span className="!text-primary font-bold">
             {getPredictionText(contractMode, localize)}
           </span>
           {showDigitInPrediction(contractMode) && (
