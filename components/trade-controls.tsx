@@ -31,7 +31,12 @@ interface TradeControlsProps {
   durationLimits: DurationLimits;
   proposal: ProposalInfo | null;
   isProposalLoading: boolean;
+  matchesProposal: ProposalInfo | null;
+  differsProposal: ProposalInfo | null;
+  isMatchesProposalLoading: boolean;
+  isDiffersProposalLoading: boolean;
   onBuy: () => void;
+  onBuyMode: (mode: 'DIGITMATCH' | 'DIGITDIFF') => void;
   isBuying: boolean;
   buyResult: BuyResult | null;
   buyError: string | null;
@@ -95,7 +100,12 @@ export function TradeControls({
   durationLimits,
   proposal,
   isProposalLoading,
+  matchesProposal,
+  differsProposal,
+  isMatchesProposalLoading,
+  isDiffersProposalLoading,
   onBuy,
+  onBuyMode,
   isBuying,
   buyResult,
   buyError,
@@ -222,21 +232,47 @@ export function TradeControls({
         )}
       </div>
 
-      {/* Buy button — fixed above footer on mobile, inline on desktop */}
+      {/* Direct Matches/Differs actions use their own live proposal. */}
       <div className="max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static">
-        <Button
-          className="w-full h-10 rounded-full px-6 sm:h-11 sm:px-8"
-          disabled={!isConnected || !proposal || isBuying}
-          onClick={onBuy}
-        >
-          {isBuying
-            ? localize('Purchasing...')
-            : proposal
-              ? localize('Buy @ {{price}} USD', {
-                  price: proposal.askPrice.toFixed(2),
-                })
-              : localize('Buy Contract')}
-        </Button>
+        {tradeType === 'matches-differs' ? (
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              className="h-10 rounded-full px-2 text-xs sm:h-11 sm:px-3 sm:text-sm"
+              disabled={!isConnected || !matchesProposal || isBuying}
+              onClick={() => onBuyMode('DIGITMATCH')}
+            >
+              {isBuying || isMatchesProposalLoading
+                ? localize('Loading...')
+                : matchesProposal
+                  ? localize('Matches @ {{price}} USD', { price: matchesProposal.askPrice.toFixed(2) })
+                  : localize('Matches')}
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-10 rounded-full px-2 text-xs sm:h-11 sm:px-3 sm:text-sm"
+              disabled={!isConnected || !differsProposal || isBuying}
+              onClick={() => onBuyMode('DIGITDIFF')}
+            >
+              {isBuying || isDiffersProposalLoading
+                ? localize('Loading...')
+                : differsProposal
+                  ? localize('Differs @ {{price}} USD', { price: differsProposal.askPrice.toFixed(2) })
+                  : localize('Differs')}
+            </Button>
+          </div>
+        ) : (
+          <Button
+            className="w-full h-10 rounded-full px-6 sm:h-11 sm:px-8"
+            disabled={!isConnected || !proposal || isBuying}
+            onClick={onBuy}
+          >
+            {isBuying
+              ? localize('Purchasing...')
+              : proposal
+                ? localize('Buy @ {{price}} USD', { price: proposal.askPrice.toFixed(2) })
+                : localize('Buy Contract')}
+          </Button>
+        )}
       </div>
 
       {isAuthenticated && (

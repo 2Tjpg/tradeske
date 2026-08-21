@@ -46,7 +46,12 @@ interface UseDigitsTradingReturn {
   defaultStake: number;
   proposal: ProposalInfo | null;
   isProposalLoading: boolean;
+  matchesProposal: ProposalInfo | null;
+  differsProposal: ProposalInfo | null;
+  isMatchesProposalLoading: boolean;
+  isDiffersProposalLoading: boolean;
   buyContract: () => Promise<void>;
+  buyContractForMode: (mode: 'DIGITMATCH' | 'DIGITDIFF') => Promise<void>;
   isBuying: boolean;
   buyResult: BuyResult | null;
   buyError: string | null;
@@ -134,7 +139,7 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
   // the consumed proposal ID. When isBuying flips back to false, the memo returns
   // real params and useProposal re-subscribes to get a fresh proposal.
   const proposalParams: ProposalParams | null = useMemo(() => {
-    if (isBuying || !activeSymbol) return null;
+    if (isBuying || !activeSymbol || tradeType === 'matches-differs') return null;
     const stakeNum = parseFloat(stake);
     if (!stakeNum || stakeNum <= 0) return null;
 
@@ -154,11 +159,49 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
 
   const { proposal } = useProposal(tradingWs, tradingIsConnected, proposalParams);
 
+  const matchesProposalParams: ProposalParams | null = useMemo(() => {
+    if (isBuying || !activeSymbol || tradeType !== 'matches-differs') return null;
+    const stakeNum = parseFloat(stake);
+    if (!stakeNum || stakeNum <= 0) return null;
+    return {
+      contractType: 'DIGITMATCH',
+      symbol: activeSymbol.underlying_symbol,
+      amount: stakeNum,
+      duration,
+      durationUnit: 't',
+      basis: 'stake' as const,
+      currency: 'USD',
+      barrier: selectedDigit,
+    };
+  }, [activeSymbol, duration, isBuying, selectedDigit, stake, tradeType]);
+
+  const differsProposalParams: ProposalParams | null = useMemo(() => {
+    if (isBuying || !activeSymbol || tradeType !== 'matches-differs') return null;
+    const stakeNum = parseFloat(stake);
+    if (!stakeNum || stakeNum <= 0) return null;
+    return {
+      contractType: 'DIGITDIFF',
+      symbol: activeSymbol.underlying_symbol,
+      amount: stakeNum,
+      duration,
+      durationUnit: 't',
+      basis: 'stake' as const,
+      currency: 'USD',
+      barrier: selectedDigit,
+    };
+  }, [activeSymbol, duration, isBuying, selectedDigit, stake, tradeType]);
+
+  const { proposal: matchesProposal } = useProposal(tradingWs, tradingIsConnected, matchesProposalParams);
+  const { proposal: differsProposal } = useProposal(tradingWs, tradingIsConnected, differsProposalParams);
+
   const buyContract = useCallback(async () => {
-    if (proposal) {
-      await buyWithProposal(proposal);
-    }
+    if (proposal) await buyWithProposal(proposal);
   }, [proposal, buyWithProposal]);
+
+  const buyContractForMode = useCallback(async (mode: 'DIGITMATCH' | 'DIGITDIFF') => {
+    const directProposal = mode === 'DIGITMATCH' ? matchesProposal : differsProposal;
+    if (directProposal) await buyWithProposal(directProposal);
+  }, [differsProposal, matchesProposal, buyWithProposal]);
 
   return {
     isConnected,
@@ -186,7 +229,12 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
     defaultStake,
     proposal,
     isProposalLoading: isConnected && proposalParams !== null && proposal === null,
+    matchesProposal,
+    differsProposal,
+    isMatchesProposalLoading: isConnected && matchesProposalParams !== null && matchesProposal === null,
+    isDiffersProposalLoading: isConnected && differsProposalParams !== null && differsProposal === null,
     buyContract,
+    buyContractForMode,
     isBuying,
     buyResult,
     buyError,

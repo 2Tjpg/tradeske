@@ -76,7 +76,12 @@ export interface DigitsViewProps {
   durationLimits: DurationLimits;
   proposal: ProposalInfo | null;
   isProposalLoading: boolean;
+  matchesProposal: ProposalInfo | null;
+  differsProposal: ProposalInfo | null;
+  isMatchesProposalLoading: boolean;
+  isDiffersProposalLoading: boolean;
   buyContract: () => Promise<void>;
+  buyContractForMode: (mode: 'DIGITMATCH' | 'DIGITDIFF') => Promise<void>;
   isBuying: boolean;
   buyResult: BuyResult | null;
   buyError: string | null;
@@ -135,7 +140,12 @@ export function DigitsView({
   durationLimits,
   proposal,
   isProposalLoading,
+  matchesProposal,
+  differsProposal,
+  isMatchesProposalLoading,
+  isDiffersProposalLoading,
   buyContract,
+  buyContractForMode,
   isBuying,
   buyResult,
   buyError,
@@ -230,7 +240,12 @@ export function DigitsView({
         durationLimits={durationLimits}
         proposal={proposal}
         isProposalLoading={isProposalLoading}
+        matchesProposal={matchesProposal}
+        differsProposal={differsProposal}
+        isMatchesProposalLoading={isMatchesProposalLoading}
+        isDiffersProposalLoading={isDiffersProposalLoading}
         onBuy={buyContract}
+        onBuyMode={buyContractForMode}
         isBuying={isBuying}
         buyResult={buyResult}
         buyError={buyError}
@@ -345,6 +360,7 @@ export function DigitsView({
                           <DigitStatsBar
                             digitStats={digitStats}
                             selectedDigit={selectedDigit}
+                            liveDigit={lastDigit}
                             onDigitSelect={setSelectedDigit}
                           />
                         </div>
@@ -365,7 +381,12 @@ export function DigitsView({
                           durationLimits={durationLimits}
                           proposal={proposal}
                           isProposalLoading={isProposalLoading}
+                          matchesProposal={matchesProposal}
+                          differsProposal={differsProposal}
+                          isMatchesProposalLoading={isMatchesProposalLoading}
+                          isDiffersProposalLoading={isDiffersProposalLoading}
                           onBuy={buyContract}
+                          onBuyMode={buyContractForMode}
                           isBuying={isBuying}
                           buyResult={buyResult}
                           buyError={buyError}

@@ -149,7 +149,12 @@ export interface ConfigurableDigitsControlsProps {
   durationLimits: DurationLimits;
   proposal: ProposalInfo | null;
   isProposalLoading: boolean;
+  matchesProposal: ProposalInfo | null;
+  differsProposal: ProposalInfo | null;
+  isMatchesProposalLoading: boolean;
+  isDiffersProposalLoading: boolean;
   onBuy: () => void;
+  onBuyMode: (mode: 'DIGITMATCH' | 'DIGITDIFF') => void;
   isBuying: boolean;
   buyResult: BuyResult | null;
   buyError: string | null;
@@ -192,7 +197,12 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
     durationLimits,
     proposal,
     isProposalLoading,
+    matchesProposal,
+    differsProposal,
+    isMatchesProposalLoading,
+    isDiffersProposalLoading,
     onBuy,
+    onBuyMode,
     isBuying,
     buyResult,
     buyError,
@@ -428,6 +438,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         <DigitStatsBar
           digitStats={digitStats}
           selectedDigit={selectedDigit}
+          liveDigit={lastDigit}
           onDigitSelect={onDigitSelect}
         />
       ),
@@ -440,6 +451,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           <div className="grid grid-cols-5 gap-1.5">
             {digitStats.percentages.map((pct, digit) => {
               const isSelected = digit === selectedDigit;
+              const isLive = digit === lastDigit;
               const isHighest = digitStats.totalTicks > 0 && pct === maxPct;
               const isLowest = digitStats.totalTicks > 0 && pct === minPct;
               return (
@@ -448,8 +460,9 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
                   variant={isSelected ? 'default' : 'outline'}
                   onClick={() => onDigitSelect(digit)}
                   className={cn(
-                    'flex h-12 flex-col items-center justify-center gap-0 rounded-lg p-0',
+                    'flex h-12 flex-col items-center justify-center gap-0 rounded-lg p-0 transition-all duration-150',
                     !isSelected && 'bg-muted/50 border-muted-foreground/20',
+                    isLive && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
                   )}
                 >
                   <span className="text-base font-semibold leading-none">{digit}</span>
@@ -482,6 +495,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           <div className="flex flex-col gap-1">
             {digitStats.percentages.map((pct, digit) => {
               const isSelected = digit === selectedDigit;
+              const isLive = digit === lastDigit;
               const isHighest = digitStats.totalTicks > 0 && pct === maxPct;
               const isLowest = digitStats.totalTicks > 0 && pct === minPct;
               return (
@@ -490,8 +504,9 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
                   variant={isSelected ? 'default' : 'outline'}
                   onClick={() => onDigitSelect(digit)}
                   className={cn(
-                    'flex h-8 w-full items-center justify-between px-3 text-sm font-medium',
+                    'flex h-8 w-full items-center justify-between px-3 text-sm font-medium transition-all duration-150',
                     !isSelected && 'bg-muted/50 border-muted-foreground/20',
+                    isLive && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
                   )}
                 >
                   <span>{digit}</span>
@@ -812,6 +827,36 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   // ── Buy (3 styles, themed) ──────────────────────────────────────────────
   // Real control = the <Button>.
   const renderBuy = () => {
+    if (tradeType === 'matches-differs') {
+      return (
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            className="h-10 flex-1 rounded-full px-2 text-xs sm:h-11 sm:px-3 sm:text-sm"
+            disabled={!isConnected || !matchesProposal || isBuying}
+            onClick={() => onBuyMode('DIGITMATCH')}
+          >
+            {isBuying || isMatchesProposalLoading
+              ? localize('Loading...')
+              : matchesProposal
+                ? localize('Matches @ {{price}} USD', { price: matchesProposal.askPrice.toFixed(2) })
+                : localize('Matches')}
+          </Button>
+          <Button
+            variant="secondary"
+            className="h-10 flex-1 rounded-full px-2 text-xs sm:h-11 sm:px-3 sm:text-sm"
+            disabled={!isConnected || !differsProposal || isBuying}
+            onClick={() => onBuyMode('DIGITDIFF')}
+          >
+            {isBuying || isDiffersProposalLoading
+              ? localize('Loading...')
+              : differsProposal
+                ? localize('Differs @ {{price}} USD', { price: differsProposal.askPrice.toFixed(2) })
+                : localize('Differs')}
+          </Button>
+        </div>
+      );
+    }
+
     const disabled = !isConnected || !proposal || isBuying;
     const label = isBuying
       ? localize('Purchasing...')

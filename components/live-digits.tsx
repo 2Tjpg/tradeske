@@ -90,7 +90,12 @@ export function LiveDigits({
       durationLimits={trading.durationLimits}
       proposal={trading.proposal}
       isProposalLoading={trading.isProposalLoading}
+      matchesProposal={trading.matchesProposal}
+      differsProposal={trading.differsProposal}
+      isMatchesProposalLoading={trading.isMatchesProposalLoading}
+      isDiffersProposalLoading={trading.isDiffersProposalLoading}
       buyContract={trading.buyContract}
+      buyContractForMode={trading.buyContractForMode}
       isBuying={trading.isBuying}
       buyResult={trading.buyResult}
       buyError={trading.buyError}
