@@ -12,8 +12,16 @@ import './custom.css';
 export function generateMetadata(): Metadata {
   const faviconUri = buildFaviconUri();
   return {
+    metadataBase: new URL('https://tradeske.com'),
     title: process.env.NEXT_PUBLIC_DERIV_APP_NAME?.trim() || 'Deriv Digits Trading App',
     description: 'A white-label trading application powered by Deriv',
+    openGraph: {
+      images: ['/og-image.png'],
+    },
+    twitter: {
+      card: 'summary_large_image' as const,
+      images: ['/og-image.png'],
+    },
     ...(faviconUri ? { icons: { icon: faviconUri } } : {}),
   };
 }
