@@ -44,6 +44,9 @@ interface TradeControlsProps {
   isAuthenticated?: boolean;
   showContractMode?: boolean;
   showPrediction?: boolean;
+  showStakeDuration?: boolean;
+  showBuy?: boolean;
+  showFeedback?: boolean;
   bottomSheet?: boolean;
 }
 
@@ -116,19 +119,22 @@ export function TradeControls({
   isAuthenticated,
   showContractMode = true,
   showPrediction = true,
+  showStakeDuration = true,
+  showBuy = true,
+  showFeedback = true,
   bottomSheet = false,
 }: TradeControlsProps) {
   const { localize } = useAppTranslations();
 
   useEffect(() => {
-    if (buyError) {
+    if (showFeedback && buyError) {
       toast.error(localize('Purchase Failed'), { description: buyError });
       onClearBuyResult();
     }
-  }, [buyError, onClearBuyResult, localize]);
+  }, [buyError, onClearBuyResult, localize, showFeedback]);
 
   useEffect(() => {
-    if (buyResult) {
+    if (showFeedback && buyResult) {
       toast.success(localize('Contract Purchased'), {
         description: localize(
           'Buy price: {{buyPrice}} USD | Payout: {{payout}} USD | Balance: {{balance}} USD',
@@ -141,7 +147,7 @@ export function TradeControls({
       });
       onClearBuyResult();
     }
-  }, [buyResult, onClearBuyResult, localize]);
+  }, [buyResult, onClearBuyResult, localize, showFeedback]);
 
   const modeOptions = getContractModeOptions(localize)[tradeType];
   const isMatchesDiffers = tradeType === 'matches-differs';
@@ -189,43 +195,45 @@ export function TradeControls({
         </ToggleGroup>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="stake" className="text-xs text-muted-foreground">
-            <Localize i18n_default_text="Stake" />
-          </Label>
-          <Input
-            id="stake"
-            type="number"
-            value={stake}
-            onChange={e => onStakeChange(e.target.value)}
-            onKeyDown={e => {
-              if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
-            }}
-            min={0}
-            step="0.01"
-            labelRight="USD"
-          />
+      {showStakeDuration && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="stake" className="text-xs text-muted-foreground">
+              <Localize i18n_default_text="Stake" />
+            </Label>
+            <Input
+              id="stake"
+              type="number"
+              value={stake}
+              onChange={e => onStakeChange(e.target.value)}
+              onKeyDown={e => {
+                if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
+              }}
+              min={0}
+              step="0.01"
+              labelRight="USD"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="duration" className="text-xs text-muted-foreground">
+              <Localize i18n_default_text="Duration" />
+            </Label>
+            <Input
+              id="duration"
+              type="number"
+              value={duration}
+              onChange={e => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val)) onDurationChange(val);
+              }}
+              min={durationLimits.min}
+              max={durationLimits.max}
+              step={1}
+              labelRight={localize('Ticks')}
+            />
+          </div>
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="duration" className="text-xs text-muted-foreground">
-            <Localize i18n_default_text="Duration" />
-          </Label>
-          <Input
-            id="duration"
-            type="number"
-            value={duration}
-            onChange={e => {
-              const val = parseInt(e.target.value, 10);
-              if (!isNaN(val)) onDurationChange(val);
-            }}
-            min={durationLimits.min}
-            max={durationLimits.max}
-            step={1}
-            labelRight={localize('Ticks')}
-          />
-        </div>
-      </div>
+      )}
 
       {showPrediction && (
         <div className="space-y-1.5 rounded-lg border border-border bg-card p-2 text-card-foreground sm:space-y-2 sm:p-3">
@@ -264,17 +272,19 @@ export function TradeControls({
       )}
 
       {/* Single buy action follows the selected contract toggle. */}
-      <div className={bottomSheet ? 'static' : 'max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static'}>
-        <Button
-          className="h-10 w-full rounded-full px-6 sm:h-11 sm:px-8"
-          disabled={!isConnected || !activeProposal || isBuying}
-          onClick={buyActiveContract}
-        >
-          {buyLabel}
-        </Button>
-      </div>
+      {showBuy && (
+        <div className={bottomSheet ? 'static' : 'max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static'}>
+          <Button
+            className="h-10 w-full rounded-full px-6 sm:h-11 sm:px-8"
+            disabled={!isConnected || !activeProposal || isBuying}
+            onClick={buyActiveContract}
+          >
+            {buyLabel}
+          </Button>
+        </div>
+      )}
 
-      {isAuthenticated && !bottomSheet && (
+      {isAuthenticated && !bottomSheet && showBuy && (
         <Button asChild variant="ghost" className="w-full text-sm text-muted-foreground hover:text-foreground">
           <Link href="/reports">
             <Localize i18n_default_text="View your positions →" />

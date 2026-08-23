@@ -274,35 +274,40 @@ export function DigitsView({
         {headerEl}
         <div className={authState === 'authenticated' ? 'h-[76px] shrink-0' : 'h-[66px] shrink-0'} />
 
-        <section className="relative min-h-0 flex-1 overflow-hidden" aria-label="Live market view">
-          <TickChart
-            data={tickHistory}
-            symbol={activeSymbol?.underlying_symbol}
-          />
+        <section className="relative flex min-h-0 flex-1 flex-col overflow-hidden" aria-label="Live market view">
+          <div className="relative z-20 shrink-0 border-b border-border bg-background/95 px-3 py-2 shadow-sm backdrop-blur-xl sm:px-5">
+            <div className="mb-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <TradeTypeChips
+                value={tradeType}
+                options={digitTradeTypeOptions}
+                onValueChange={setTradeType}
+              />
+            </div>
+            <div className="w-[min(22rem,100%)]">
+              <SymbolSelector
+                symbols={symbols}
+                activeSymbol={activeSymbol}
+                onSymbolChange={selectSymbol}
+                prices={tickHistory.map(point => point.value)}
+                pipSize={pipSize}
+              />
+            </div>
+          </div>
 
-          <div className="absolute left-3 top-3 z-10 w-[min(22rem,calc(100%-1.5rem))] rounded-md border border-border bg-background/90 p-2 shadow-sm backdrop-blur-md">
-            <SymbolSelector
-              symbols={symbols}
-              activeSymbol={activeSymbol}
-              onSymbolChange={selectSymbol}
-              prices={tickHistory.map(point => point.value)}
-              pipSize={pipSize}
+          <div className="relative min-h-0 flex-1">
+            <TickChart
+              data={tickHistory}
+              symbol={activeSymbol?.underlying_symbol}
             />
           </div>
 
-          <div
-            className={`absolute inset-x-0 bottom-0 z-10 mx-auto flex max-h-[min(78vh,42rem)] w-full max-w-3xl flex-col rounded-t-lg border border-b-0 border-border bg-background/95 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-out motion-reduce:transition-none ${
-              isSheetExpanded
-                ? 'translate-y-0'
-                : 'translate-y-[calc(100%-11.5rem-env(safe-area-inset-bottom))]'
-            }`}
-          >
+          <div className="relative z-10 shrink-0 border-t border-border bg-background/95 shadow-2xl backdrop-blur-xl">
             <button
               type="button"
               onClick={() => setIsSheetExpanded(expanded => !expanded)}
               aria-expanded={isSheetExpanded}
-              aria-label={isSheetExpanded ? 'Collapse trading controls' : 'Expand trading controls'}
-              className="mx-auto flex h-8 w-14 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              aria-label={isSheetExpanded ? 'Collapse digit predictions' : 'Expand digit predictions'}
+              className="mx-auto flex h-8 w-14 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {isSheetExpanded ? (
                 <ChevronDown className="h-5 w-5" aria-hidden="true" />
@@ -311,19 +316,16 @@ export function DigitsView({
               )}
             </button>
 
-            <div className="min-h-0 overflow-y-auto overscroll-contain px-3 pb-3 sm:px-5">
-              <div
-                className="space-y-3 pb-3"
-                aria-hidden={!isSheetExpanded}
-                inert={!isSheetExpanded ? true : undefined}
-              >
-                <div className="overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  <TradeTypeChips
-                    value={tradeType}
-                    options={digitTradeTypeOptions}
-                    onValueChange={setTradeType}
-                  />
-                </div>
+            <div
+              className={`overflow-hidden px-3 transition-[max-height,opacity,transform] duration-300 ease-out motion-reduce:transition-none sm:px-5 ${
+                isSheetExpanded
+                  ? 'max-h-[min(22rem,45vh)] translate-y-0 opacity-100'
+                  : 'pointer-events-none max-h-0 -translate-y-2 opacity-0'
+              }`}
+              aria-hidden={!isSheetExpanded}
+              inert={!isSheetExpanded ? true : undefined}
+            >
+              <div className="space-y-3 pb-3">
                 <DigitStatsBar
                   digitStats={digitStats}
                   selectedDigit={selectedDigit}
@@ -331,8 +333,39 @@ export function DigitsView({
                   onDigitSelect={setSelectedDigit}
                   readOnly={tradeType === 'even-odd'}
                 />
+                <TradeControls
+                  tradeType={tradeType}
+                  contractMode={contractMode}
+                  onContractModeChange={setContractMode}
+                  selectedDigit={selectedDigit}
+                  isConnected={isConnected}
+                  stake={stake}
+                  onStakeChange={setStake}
+                  duration={duration}
+                  onDurationChange={setDuration}
+                  durationLimits={durationLimits}
+                  proposal={proposal}
+                  isProposalLoading={isProposalLoading}
+                  matchesProposal={matchesProposal}
+                  differsProposal={differsProposal}
+                  isMatchesProposalLoading={isMatchesProposalLoading}
+                  isDiffersProposalLoading={isDiffersProposalLoading}
+                  onBuy={buyContract}
+                  onBuyMode={buyContractForMode}
+                  isBuying={isBuying}
+                  buyResult={buyResult}
+                  buyError={buyError}
+                  onClearBuyResult={clearBuyResult}
+                  isAuthenticated={authState === 'authenticated'}
+                  showStakeDuration={false}
+                  showBuy={false}
+                  showFeedback={false}
+                  bottomSheet
+                />
               </div>
+            </div>
 
+            <div className="px-3 pb-3 sm:px-5">
               <TradeControls
                 tradeType={tradeType}
                 contractMode={contractMode}
@@ -357,6 +390,7 @@ export function DigitsView({
                 buyError={buyError}
                 onClearBuyResult={clearBuyResult}
                 isAuthenticated={authState === 'authenticated'}
+                showContractMode={false}
                 showPrediction={false}
                 bottomSheet
               />
