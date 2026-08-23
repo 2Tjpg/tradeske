@@ -100,7 +100,9 @@ export function LiveDigits({
       buyResult={trading.buyResult}
       buyError={trading.buyError}
       clearBuyResult={trading.clearBuyResult}
+      tickHistory={trading.tickHistory}
       appConfig={appConfig}
+      phaseOneTradeUi={!editMode}
       editMode={editMode}
       onSelect={onSelect}
       selectedKey={selectedKey}

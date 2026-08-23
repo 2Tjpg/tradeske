@@ -3,7 +3,14 @@
 import { useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useActiveSymbols, useTicks } from '@deriv/core';
-import type { DerivWS, ActiveSymbol, Tick, DurationLimits, ContractInfo } from '@deriv/core';
+import type {
+  DerivWS,
+  ActiveSymbol,
+  Tick,
+  TickPoint,
+  DurationLimits,
+  ContractInfo,
+} from '@deriv/core';
 import { useAppTranslations } from '@/components/custom/i18n-provider';
 import { useOpenPositions, type OpenPosition } from './use-open-positions';
 import { useClosedPositions, type ClosedPosition } from './use-closed-positions';
@@ -34,6 +41,8 @@ export interface UseBaseTradingReturn {
   currentTick: Tick | null;
   /** Raw price history — useful for chart rendering and stat computation. */
   prices: number[];
+  /** Timestamped history for live chart rendering. */
+  tickHistory: TickPoint[];
   pipSize: number;
   contracts: ContractInfo[];
   contractsAvailable: boolean;
@@ -83,7 +92,11 @@ export function useBaseTrading({
     isLoading: symbolsLoading,
   } = useActiveSymbols(ws, isConnected, contractTypes);
 
-  const { currentTick, prices, pipSize } = useTicks(ws, isConnected, activeSymbol);
+  const { currentTick, prices, tickHistory, pipSize } = useTicks(
+    ws,
+    isConnected,
+    activeSymbol
+  );
 
   // Surface WS-level errors as toasts. Buy and sell errors are handled by
   // their own hooks and are excluded here to avoid double-reporting.
@@ -135,6 +148,7 @@ export function useBaseTrading({
     selectSymbol,
     currentTick,
     prices,
+    tickHistory,
     pipSize,
     contracts,
     contractsAvailable,

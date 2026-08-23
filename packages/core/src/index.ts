@@ -73,6 +73,7 @@ export { pickDefaultSymbol } from './utils/pick-default-symbol';
 export { DerivWS } from './ws';
 
 // React Hooks
+export type { TickPoint } from './react';
 export {
   useDerivWS,
   useActiveSymbols,

@@ -42,6 +42,9 @@ interface TradeControlsProps {
   buyError: string | null;
   onClearBuyResult: () => void;
   isAuthenticated?: boolean;
+  showContractMode?: boolean;
+  showPrediction?: boolean;
+  bottomSheet?: boolean;
 }
 
 function getContractModeOptions(
@@ -111,6 +114,9 @@ export function TradeControls({
   buyError,
   onClearBuyResult,
   isAuthenticated,
+  showContractMode = true,
+  showPrediction = true,
+  bottomSheet = false,
 }: TradeControlsProps) {
   const { localize } = useAppTranslations();
 
@@ -162,24 +168,26 @@ export function TradeControls({
 
   return (
     <div className="space-y-2 sm:space-y-4">
-      <ToggleGroup
-        type="single"
-        value={contractMode}
-        onValueChange={value => {
-          if (value) onContractModeChange(value as ContractMode);
-        }}
-        className="w-full gap-0 rounded-full bg-muted p-1"
-      >
-        {modeOptions.map(opt => (
-          <ToggleGroupItem
-            key={opt.value}
-            value={opt.value}
-            className="flex-1 rounded-full text-sm font-medium text-muted-foreground data-[state=on]:bg-background data-[state=on]:!text-primary data-[state=on]:font-bold data-[state=on]:shadow-sm hover:text-foreground"
-          >
-            {opt.label}
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      {showContractMode && (
+        <ToggleGroup
+          type="single"
+          value={contractMode}
+          onValueChange={value => {
+            if (value) onContractModeChange(value as ContractMode);
+          }}
+          className="w-full gap-0 rounded-full bg-muted p-1"
+        >
+          {modeOptions.map(opt => (
+            <ToggleGroupItem
+              key={opt.value}
+              value={opt.value}
+              className="flex-1 rounded-full text-sm font-medium text-muted-foreground data-[state=on]:bg-background data-[state=on]:!text-primary data-[state=on]:font-bold data-[state=on]:shadow-sm hover:text-foreground"
+            >
+              {opt.label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
@@ -219,42 +227,44 @@ export function TradeControls({
         </div>
       </div>
 
-      <div className="space-y-1.5 rounded-lg border border-border bg-card p-2 text-card-foreground sm:space-y-2 sm:p-3">
-        <p className="mb-0 text-[11px] text-muted-foreground sm:text-xs">
-          <Localize i18n_default_text="Prediction" />
-        </p>
-        <p className="text-xs sm:text-sm font-medium">
-          <Localize i18n_default_text="Last digit of the price will" />{' '}
-          <span className="!text-primary font-bold">
-            {getPredictionText(contractMode, localize)}
-          </span>
-          {showDigitInPrediction(contractMode) && (
-            <>
-              {' '}
-              <span className="inline-flex w-5 h-5 rounded-full bg-primary text-primary-foreground items-center justify-center text-xs font-bold">
-                {selectedDigit}
-              </span>
-            </>
-          )}
-        </p>
-        {(activeProposal || activeProposalLoading) && (
-          <div className="flex items-center justify-between border-t border-border pt-1">
-            <span className="text-xs text-muted-foreground">
-              <Localize i18n_default_text="Payout" />
+      {showPrediction && (
+        <div className="space-y-1.5 rounded-lg border border-border bg-card p-2 text-card-foreground sm:space-y-2 sm:p-3">
+          <p className="mb-0 text-[11px] text-muted-foreground sm:text-xs">
+            <Localize i18n_default_text="Prediction" />
+          </p>
+          <p className="text-xs sm:text-sm font-medium">
+            <Localize i18n_default_text="Last digit of the price will" />{' '}
+            <span className="!text-primary font-bold">
+              {getPredictionText(contractMode, localize)}
             </span>
-            {activeProposalLoading ? (
-              <Skeleton className="h-4 w-24" />
-            ) : (
-              <span className="text-sm font-bold text-foreground">
-                {activeProposal!.payout.toFixed(2)} USD
-              </span>
+            {showDigitInPrediction(contractMode) && (
+              <>
+                {' '}
+                <span className="inline-flex w-5 h-5 rounded-full bg-primary text-primary-foreground items-center justify-center text-xs font-bold">
+                  {selectedDigit}
+                </span>
+              </>
             )}
-          </div>
-        )}
-      </div>
+          </p>
+          {(activeProposal || activeProposalLoading) && (
+            <div className="flex items-center justify-between border-t border-border pt-1">
+              <span className="text-xs text-muted-foreground">
+                <Localize i18n_default_text="Payout" />
+              </span>
+              {activeProposalLoading ? (
+                <Skeleton className="h-4 w-24" />
+              ) : (
+                <span className="text-sm font-bold text-foreground">
+                  {activeProposal!.payout.toFixed(2)} USD
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Single buy action follows the selected contract toggle. */}
-      <div className="max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static">
+      <div className={bottomSheet ? 'static' : 'max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static'}>
         <Button
           className="h-10 w-full rounded-full px-6 sm:h-11 sm:px-8"
           disabled={!isConnected || !activeProposal || isBuying}
@@ -264,7 +274,7 @@ export function TradeControls({
         </Button>
       </div>
 
-      {isAuthenticated && (
+      {isAuthenticated && !bottomSheet && (
         <Button asChild variant="ghost" className="w-full text-sm text-muted-foreground hover:text-foreground">
           <Link href="/reports">
             <Localize i18n_default_text="View your positions →" />

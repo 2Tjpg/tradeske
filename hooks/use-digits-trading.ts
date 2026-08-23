@@ -8,6 +8,7 @@ import {
 import type {
   ActiveSymbol,
   Tick,
+  TickPoint,
   ProposalInfo,
   ProposalParams,
   DurationLimits,
@@ -28,6 +29,7 @@ interface UseDigitsTradingReturn {
   activeSymbol: ActiveSymbol | null;
   selectSymbol: (symbol: string) => void;
   currentTick: Tick | null;
+  tickHistory: TickPoint[];
   lastDigit: number | null;
   digitStats: DigitStats;
   tradeType: TradeType;
@@ -77,6 +79,7 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
     selectSymbol,
     currentTick,
     prices,
+    tickHistory,
     pipSize,
     contractsAvailable,
     durationLimits,
@@ -211,6 +214,7 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
     activeSymbol,
     selectSymbol,
     currentTick,
+    tickHistory,
     lastDigit,
     digitStats,
     tradeType,

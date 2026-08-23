@@ -6,9 +6,15 @@ import type { ActiveSymbol, Tick, TicksHistoryResponse } from '../types';
 
 const DEFAULT_TICK_COUNT = 1000;
 
+export interface TickPoint {
+  time: number;
+  value: number;
+}
+
 interface UseTicksReturn {
   currentTick: Tick | null;
   prices: number[];
+  tickHistory: TickPoint[];
   pipSize: number;
 }
 
@@ -19,11 +25,13 @@ export function useTicks(
   tickCount: number = DEFAULT_TICK_COUNT
 ): UseTicksReturn {
   const pricesRef = useRef<number[]>([]);
+  const tickHistoryRef = useRef<TickPoint[]>([]);
   const pipSizeRef = useRef<number>(2);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   const [currentTick, setCurrentTick] = useState<Tick | null>(null);
   const [prices, setPrices] = useState<number[]>([]);
+  const [tickHistory, setTickHistory] = useState<TickPoint[]>([]);
   const [pipSize, setPipSize] = useState<number>(2);
 
   const pipSizeFromPip = useCallback((pip: number): number => {
@@ -43,8 +51,12 @@ export function useTicks(
       unsubscribeRef.current = null;
     }
 
-    // Reset refs
+    // Reset the active symbol's data before loading its history.
     pricesRef.current = [];
+    tickHistoryRef.current = [];
+    setCurrentTick(null);
+    setPrices([]);
+    setTickHistory([]);
 
     const ps = pipSizeFromPip(activeSymbol.pip_size);
     pipSizeRef.current = ps;
@@ -61,8 +73,15 @@ export function useTicks(
 
       setPipSize(ps);
       const historyPrices = historyResponse.history?.prices ?? [];
+      const historyTimes = historyResponse.history?.times ?? [];
+      const historyPoints = historyPrices.flatMap((value, index) => {
+        const time = historyTimes[index];
+        return Number.isFinite(value) && Number.isFinite(time) ? [{ time, value }] : [];
+      });
       pricesRef.current = historyPrices;
+      tickHistoryRef.current = historyPoints;
       setPrices([...historyPrices]);
+      setTickHistory([...historyPoints]);
 
       const sub = await ws!.subscribe(
         { ticks: activeSymbol!.underlying_symbol },
@@ -76,12 +95,14 @@ export function useTicks(
 
             setCurrentTick(tick);
 
-            // Sliding window update
-            pricesRef.current = [...pricesRef.current, tick.quote];
-            if (pricesRef.current.length > tickCount) {
-              pricesRef.current = pricesRef.current.slice(-tickCount);
-            }
+            // Keep aligned sliding windows for digit statistics and chart data.
+            pricesRef.current = [...pricesRef.current, tick.quote].slice(-tickCount);
+            tickHistoryRef.current = [
+              ...tickHistoryRef.current.filter(point => point.time !== tick.epoch),
+              { time: tick.epoch, value: tick.quote },
+            ].slice(-tickCount);
             setPrices([...pricesRef.current]);
+            setTickHistory([...tickHistoryRef.current]);
             setPipSize(tickPs);
           }
         }
@@ -93,12 +114,13 @@ export function useTicks(
       unsubscribeRef.current = sub.unsubscribe;
     }
 
-    subscribe().catch(() => {});
+    subscribe().catch(() => { });
 
     return () => {
       disposed = true;
       setCurrentTick(null);
       setPrices([]);
+      setTickHistory([]);
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
         unsubscribeRef.current = null;
@@ -106,10 +128,10 @@ export function useTicks(
       // Send forget_all for ticks so the server clears the stream before the
       // next mount re-subscribes — prevents AlreadySubscribed on navigation.
       if (ws?.isConnected) {
-        ws.send({ forget_all: 'ticks' }).catch(() => {});
+        ws.send({ forget_all: 'ticks' }).catch(() => { });
       }
     };
   }, [ws, isConnected, activeSymbol, tickCount, pipSizeFromPip]);
 
-  return { currentTick, prices, pipSize };
+  return { currentTick, prices, tickHistory, pipSize };
 }

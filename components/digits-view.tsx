@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { Ban } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Ban, ChevronDown, ChevronUp } from 'lucide-react';
 import { Localize } from '@deriv-com/translations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Footer } from '@/components/custom/footer';
@@ -16,11 +16,13 @@ import { ConfigurableDigitsControls } from './configurable-digits-controls';
 import { TradeTypeChips } from '@/components/custom/trade-type-chips';
 import { SymbolSelector } from '@/components/custom/symbol-selector';
 import { ThemeToggle } from '@/components/custom/theme-toggle';
+import { TickChart } from './tick-chart';
 import type {
   AuthState,
   DerivAccount,
   ActiveSymbol,
   Tick,
+  TickPoint,
   ProposalInfo,
   DurationLimits,
   BuyResult,
@@ -58,6 +60,7 @@ export interface DigitsViewProps {
   activeSymbol: ActiveSymbol | null;
   selectSymbol: (symbol: string) => void;
   currentTick: Tick | null;
+  tickHistory: TickPoint[];
   lastDigit: number | null;
   digitStats: DigitStats;
   pipSize: number;
@@ -97,6 +100,8 @@ export interface DigitsViewProps {
    * DigitsView layout renders unchanged.
    */
   appConfig?: DigitsAppConfig;
+  /** Enables the live chart and bottom-sheet presentation on the deployed trade page. */
+  phaseOneTradeUi?: boolean;
   /** Edit mode — components become selectable (click opens their accordion). */
   editMode?: boolean;
   /** Called when an editable component is clicked (e.g. "stake"). */
@@ -124,6 +129,7 @@ export function DigitsView({
   activeSymbol,
   selectSymbol,
   currentTick,
+  tickHistory,
   lastDigit,
   digitStats,
   pipSize,
@@ -154,6 +160,7 @@ export function DigitsView({
   appName,
   showAppName,
   appConfig,
+  phaseOneTradeUi = false,
   editMode,
   onSelect,
   selectedKey,
@@ -161,6 +168,7 @@ export function DigitsView({
   onReorder,
 }: DigitsViewProps) {
   const isMobile = useIsMobile();
+  const [isSheetExpanded, setIsSheetExpanded] = useState(true);
   const { localize } = useAppTranslations();
   const digitTradeTypeOptions = getDigitTradeTypeOptions(localize);
 
@@ -259,6 +267,106 @@ export function DigitsView({
         onReorder={onReorder}
       />
     ) : null;
+
+  if (phaseOneTradeUi && !isLoading) {
+    return (
+      <main className="flex h-dvh min-h-0 flex-col overflow-hidden bg-background">
+        {headerEl}
+        <div className={authState === 'authenticated' ? 'h-[76px] shrink-0' : 'h-[66px] shrink-0'} />
+
+        <section className="relative min-h-0 flex-1 overflow-hidden" aria-label="Live market view">
+          <TickChart
+            data={tickHistory}
+            symbol={activeSymbol?.underlying_symbol}
+          />
+
+          <div className="absolute left-3 top-3 z-10 w-[min(22rem,calc(100%-1.5rem))] rounded-md border border-border bg-background/90 p-2 shadow-sm backdrop-blur-md">
+            <SymbolSelector
+              symbols={symbols}
+              activeSymbol={activeSymbol}
+              onSymbolChange={selectSymbol}
+              prices={tickHistory.map(point => point.value)}
+              pipSize={pipSize}
+            />
+          </div>
+
+          <div
+            className={`absolute inset-x-0 bottom-0 z-10 mx-auto flex max-h-[min(78vh,42rem)] w-full max-w-3xl flex-col rounded-t-lg border border-b-0 border-border bg-background/95 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-out motion-reduce:transition-none ${
+              isSheetExpanded
+                ? 'translate-y-0'
+                : 'translate-y-[calc(100%-11.5rem-env(safe-area-inset-bottom))]'
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => setIsSheetExpanded(expanded => !expanded)}
+              aria-expanded={isSheetExpanded}
+              aria-label={isSheetExpanded ? 'Collapse trading controls' : 'Expand trading controls'}
+              className="mx-auto flex h-8 w-14 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              {isSheetExpanded ? (
+                <ChevronDown className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <ChevronUp className="h-5 w-5" aria-hidden="true" />
+              )}
+            </button>
+
+            <div className="min-h-0 overflow-y-auto overscroll-contain px-3 pb-3 sm:px-5">
+              <div
+                className="space-y-3 pb-3"
+                aria-hidden={!isSheetExpanded}
+                inert={!isSheetExpanded ? true : undefined}
+              >
+                <div className="overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <TradeTypeChips
+                    value={tradeType}
+                    options={digitTradeTypeOptions}
+                    onValueChange={setTradeType}
+                  />
+                </div>
+                <DigitStatsBar
+                  digitStats={digitStats}
+                  selectedDigit={selectedDigit}
+                  liveDigit={lastDigit}
+                  onDigitSelect={setSelectedDigit}
+                  readOnly={tradeType === 'even-odd'}
+                />
+              </div>
+
+              <TradeControls
+                tradeType={tradeType}
+                contractMode={contractMode}
+                onContractModeChange={setContractMode}
+                selectedDigit={selectedDigit}
+                isConnected={isConnected}
+                stake={stake}
+                onStakeChange={setStake}
+                duration={duration}
+                onDurationChange={setDuration}
+                durationLimits={durationLimits}
+                proposal={proposal}
+                isProposalLoading={isProposalLoading}
+                matchesProposal={matchesProposal}
+                differsProposal={differsProposal}
+                isMatchesProposalLoading={isMatchesProposalLoading}
+                isDiffersProposalLoading={isDiffersProposalLoading}
+                onBuy={buyContract}
+                onBuyMode={buyContractForMode}
+                isBuying={isBuying}
+                buyResult={buyResult}
+                buyError={buyError}
+                onClearBuyResult={clearBuyResult}
+                isAuthenticated={authState === 'authenticated'}
+                showPrediction={false}
+                bottomSheet
+              />
+              <div className="h-[env(safe-area-inset-bottom)]" />
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main
