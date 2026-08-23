@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import {
   AreaSeries,
@@ -110,7 +108,7 @@ export function TickChart({
     });
     const tailSeries = chart.addSeries(LineSeries, {
       color: '#dc2626',
-      lineWidth: 3,
+      lineWidth: 2,
       priceLineVisible: false,
       lastValueVisible: false,
       crosshairMarkerVisible: false,
@@ -180,12 +178,19 @@ export function TickChart({
     previousSymbolRef.current = symbol;
 
     series.setData(chartData);
-    tailSeries.setData(
-      activeTail.map(point => ({
-        time: point.time as UTCTimestamp,
-        value: point.value,
-      }))
-    );
+    const lastBluePoint = chartData[chartData.length - 1];
+    const tailData = lastBluePoint && activeTail.length > 0
+      ? [
+          lastBluePoint,
+          ...activeTail
+            .filter(point => point.time > Number(lastBluePoint.time))
+            .map(point => ({
+              time: point.time as UTCTimestamp,
+              value: point.value,
+            })),
+        ]
+      : [];
+    tailSeries.setData(tailData);
     tailSeries.applyOptions({ color: tailColor });
 
     if (entryLineRef.current) {
@@ -219,6 +224,12 @@ export function TickChart({
     }
   }, [activeTail, data, entry, symbol, tailColor]);
 
+  useEffect(() => {
+    if (!payout || !onDismissPayout) return;
+    const timeoutId = window.setTimeout(onDismissPayout, 3000);
+    return () => window.clearTimeout(timeoutId);
+  }, [onDismissPayout, payout]);
+
   return (
     <div className="absolute inset-0">
       <div
@@ -228,21 +239,13 @@ export function TickChart({
         aria-label={symbol ? `Live price chart for ${symbol}` : 'Live price chart'}
       />
       {payout && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/10">
-          <div className="flex items-center gap-2 rounded-md bg-background/95 px-4 py-3 shadow-lg ring-1 ring-border">
-            <span className={`text-2xl font-bold ${payout.isWin ? 'text-emerald-500' : 'text-rose-500'}`}>
-              Payout {payout.isWin ? '+' : '-'}{payout.amount.toFixed(2)}
-            </span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={onDismissPayout}
-              aria-label="Dismiss payout result"
-              title="Dismiss payout result"
-            >
-              <X aria-hidden="true" />
-            </Button>
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-background/10">
+          <div
+            className={`rounded-md bg-background/95 px-5 py-3 text-2xl font-bold shadow-lg ring-1 ring-border ${payout.isWin ? 'text-emerald-500' : 'text-rose-500'}`}
+            role="status"
+            aria-live="polite"
+          >
+            Payout {payout.isWin ? '+' : '-'}{payout.amount.toFixed(2)}
           </div>
         </div>
       )}

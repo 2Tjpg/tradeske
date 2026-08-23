@@ -396,6 +396,7 @@ export function DigitsView({
                 isDiffersProposalLoading={isDiffersProposalLoading}
                 onBuy={buyContract}
                 onBuyMode={buyContractForMode}
+                onBuyStarted={() => setIsSheetExpanded(false)}
                 isBuying={isBuying}
                 buyResult={buyResult}
                 buyError={buyError}
