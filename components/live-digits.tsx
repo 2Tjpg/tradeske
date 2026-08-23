@@ -67,6 +67,7 @@ export function LiveDigits({
       logoSrc={logoSrc}
       appName={appName}
       showAppName={showAppName}
+      ws={trading.ws}
       isConnected={trading.isConnected}
       isLoading={trading.isLoading}
       error={trading.error}

@@ -17,6 +17,8 @@ import { TradeTypeChips } from '@/components/custom/trade-type-chips';
 import { SymbolSelector } from '@/components/custom/symbol-selector';
 import { ThemeToggle } from '@/components/custom/theme-toggle';
 import { TickChart } from './tick-chart';
+import { useTradeChartTracking } from '@/hooks/use-trade-chart-tracking';
+import type { DerivWS } from '@deriv/core';
 import type {
   AuthState,
   DerivAccount,
@@ -56,6 +58,7 @@ export interface DigitsViewProps {
   error: string | null;
 
   // Market data
+  ws: DerivWS | null;
   symbols: ActiveSymbol[];
   activeSymbol: ActiveSymbol | null;
   selectSymbol: (symbol: string) => void;
@@ -125,6 +128,7 @@ export function DigitsView({
   isConnected,
   isLoading,
   error,
+  ws,
   symbols,
   activeSymbol,
   selectSymbol,
@@ -168,6 +172,7 @@ export function DigitsView({
   onReorder,
 }: DigitsViewProps) {
   const isMobile = useIsMobile();
+  const chartTracking = useTradeChartTracking(ws, isConnected, buyResult);
   const [isSheetExpanded, setIsSheetExpanded] = useState(true);
   const { localize } = useAppTranslations();
   const digitTradeTypeOptions = getDigitTradeTypeOptions(localize);
@@ -288,8 +293,6 @@ export function DigitsView({
                 symbols={symbols}
                 activeSymbol={activeSymbol}
                 onSymbolChange={selectSymbol}
-                prices={tickHistory.map(point => point.value)}
-                pipSize={pipSize}
               />
             </div>
           </div>
@@ -298,6 +301,11 @@ export function DigitsView({
             <TickChart
               data={tickHistory}
               symbol={activeSymbol?.underlying_symbol}
+              activeTail={chartTracking.activeTail}
+              tailColor={chartTracking.tailColor}
+              entry={chartTracking.entry}
+              payout={chartTracking.payout}
+              onDismissPayout={chartTracking.dismissResult}
             />
           </div>
 

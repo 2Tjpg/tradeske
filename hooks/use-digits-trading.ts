@@ -6,6 +6,7 @@ import {
   useBuy,
 } from '@deriv/core';
 import type {
+  DerivWS,
   ActiveSymbol,
   Tick,
   TickPoint,
@@ -22,6 +23,7 @@ import type { ContractMode, TradeType, DigitStats, OpenPosition, ClosedPosition 
 const CONTRACT_TYPES = ['DIGITMATCH', 'DIGITDIFF', 'DIGITOVER', 'DIGITUNDER', 'DIGITEVEN', 'DIGITODD'];
 
 interface UseDigitsTradingReturn {
+  ws: DerivWS | null;
   isConnected: boolean;
   isLoading: boolean;
   error: string | null;
@@ -207,6 +209,7 @@ export function useDigitsTrading({ ws, isConnected, isExhausted, isAuthenticated
   }, [differsProposal, matchesProposal, buyWithProposal]);
 
   return {
+    ws: tradingWs,
     isConnected,
     isLoading,
     error,
