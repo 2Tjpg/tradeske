@@ -325,7 +325,7 @@ export function DigitsView({
               aria-hidden={!isSheetExpanded}
               inert={!isSheetExpanded ? true : undefined}
             >
-              <div className="space-y-3 pb-3">
+              <div className="pb-3">
                 <DigitStatsBar
                   digitStats={digitStats}
                   selectedDigit={selectedDigit}
@@ -333,36 +333,39 @@ export function DigitsView({
                   onDigitSelect={setSelectedDigit}
                   readOnly={tradeType === 'even-odd'}
                 />
-                <TradeControls
-                  tradeType={tradeType}
-                  contractMode={contractMode}
-                  onContractModeChange={setContractMode}
-                  selectedDigit={selectedDigit}
-                  isConnected={isConnected}
-                  stake={stake}
-                  onStakeChange={setStake}
-                  duration={duration}
-                  onDurationChange={setDuration}
-                  durationLimits={durationLimits}
-                  proposal={proposal}
-                  isProposalLoading={isProposalLoading}
-                  matchesProposal={matchesProposal}
-                  differsProposal={differsProposal}
-                  isMatchesProposalLoading={isMatchesProposalLoading}
-                  isDiffersProposalLoading={isDiffersProposalLoading}
-                  onBuy={buyContract}
-                  onBuyMode={buyContractForMode}
-                  isBuying={isBuying}
-                  buyResult={buyResult}
-                  buyError={buyError}
-                  onClearBuyResult={clearBuyResult}
-                  isAuthenticated={authState === 'authenticated'}
-                  showStakeDuration={false}
-                  showBuy={false}
-                  showFeedback={false}
-                  bottomSheet
-                />
               </div>
+            </div>
+
+            <div className="space-y-3 px-3 pb-3 sm:px-5">
+              <TradeControls
+                tradeType={tradeType}
+                contractMode={contractMode}
+                onContractModeChange={setContractMode}
+                selectedDigit={selectedDigit}
+                isConnected={isConnected}
+                stake={stake}
+                onStakeChange={setStake}
+                duration={duration}
+                onDurationChange={setDuration}
+                durationLimits={durationLimits}
+                proposal={proposal}
+                isProposalLoading={isProposalLoading}
+                matchesProposal={matchesProposal}
+                differsProposal={differsProposal}
+                isMatchesProposalLoading={isMatchesProposalLoading}
+                isDiffersProposalLoading={isDiffersProposalLoading}
+                onBuy={buyContract}
+                onBuyMode={buyContractForMode}
+                isBuying={isBuying}
+                buyResult={buyResult}
+                buyError={buyError}
+                onClearBuyResult={clearBuyResult}
+                isAuthenticated={authState === 'authenticated'}
+                showStakeDuration={false}
+                showBuy={false}
+                showFeedback={false}
+                bottomSheet
+              />
             </div>
 
             <div className="px-3 pb-3 sm:px-5">
