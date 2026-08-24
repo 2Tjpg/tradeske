@@ -297,6 +297,8 @@ export function DigitsView({
                 symbols={symbols}
                 activeSymbol={activeSymbol}
                 onSymbolChange={selectSymbol}
+                prices={tickHistory.map(point => point.value)}
+                pipSize={pipSize}
               />
             </div>
           </div>
@@ -513,6 +515,8 @@ export function DigitsView({
                         symbols={symbols}
                         activeSymbol={activeSymbol}
                         onSymbolChange={selectSymbol}
+                        prices={tickHistory.map(point => point.value)}
+                        pipSize={pipSize}
                       />
                       <div className="flex items-center justify-center min-h-24 sm:min-h-32 lg:flex-1">
                         <CurrentTickDisplay

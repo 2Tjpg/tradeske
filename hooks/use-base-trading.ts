@@ -107,6 +107,7 @@ export function useBaseTrading({
       const msgType = data.msg_type as string | undefined;
       if (msgType === 'buy' || msgType === 'sell') return;
       const err = data.error as Record<string, string>;
+      if (/number of ticks must be between 1 and 10/i.test(err.message ?? '')) return;
       toast.error(localize('Error'), {
         // API message when present; app-authored fallback otherwise.
         description: err.message ?? localize('Unexpected error occurred. Please try again.'),

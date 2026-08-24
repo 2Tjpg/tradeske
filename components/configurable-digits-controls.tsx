@@ -673,25 +673,37 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   };
 
   // ── Duration (3 styles) ─────────────────────────────────────────────────
-  // Real control = ticks <Input>.
   const renderDuration = () => {
-    const clamp = (amount: number) => Math.min(durationLimits.max, Math.max(durationLimits.min, amount));
-    const setDurationNum = (amount: number) => onDurationChange(clamp(amount));
-    const durationInput = (extraClass?: string) => (
-      <Input
-        id="duration"
-        type="number"
-        value={duration}
-        onChange={(event) => {
-          const val = parseInt(event.target.value, 10);
-          if (!isNaN(val)) onDurationChange(val);
-        }}
-        min={durationLimits.min}
-        max={durationLimits.max}
-        step={1}
-        labelRight={localize('Ticks')}
-        className={extraClass}
-      />
+    const setDurationNum = (amount: number) => onDurationChange(Math.min(10, Math.max(1, amount)));
+    const durationStepper = () => (
+      <div className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-1">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0 rounded-md disabled:opacity-30"
+          onClick={() => setDurationNum(duration - 1)}
+          disabled={duration <= 1}
+          aria-label={localize('Decrease duration')}
+        >
+          −
+        </Button>
+        <span className="min-w-0 flex-1 text-center text-sm font-semibold tabular-nums">
+          {duration}{' '}
+          <span className="font-normal text-muted-foreground">{localize('Ticks')}</span>
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0 rounded-md disabled:opacity-30"
+          onClick={() => setDurationNum(duration + 1)}
+          disabled={duration >= 10}
+          aria-label={localize('Increase duration')}
+        >
+          +
+        </Button>
+      </div>
     );
 
     const variants: Record<StyleVariant, () => React.ReactNode> = {
@@ -701,7 +713,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           <Label htmlFor="duration" className="text-xs text-muted-foreground">
             <Localize i18n_default_text="Duration" />
           </Label>
-          {durationInput()}
+          {durationStepper()}
         </div>
       ),
       // <Input> flanked by −/+ <Button> steppers.
@@ -710,11 +722,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           <Label htmlFor="duration" className="text-xs text-muted-foreground">
             <Localize i18n_default_text="Duration" />
           </Label>
-          <div className="flex w-full items-center gap-2">
-            <Button variant="outline" size="icon" className="shrink-0" onClick={() => setDurationNum(duration - 1)}>−</Button>
-            <div className="flex-1">{durationInput('text-center')}</div>
-            <Button variant="outline" size="icon" className="shrink-0" onClick={() => setDurationNum(duration + 1)}>+</Button>
-          </div>
+          {durationStepper()}
         </div>
       ),
       // Preset chip <Button>s (1/5/10) + <Input>.
@@ -736,7 +744,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
               </Button>
             ))}
           </div>
-          {durationInput()}
+          {durationStepper()}
         </div>
       ),
     };

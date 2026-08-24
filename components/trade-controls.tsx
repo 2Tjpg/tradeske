@@ -218,22 +218,37 @@ export function TradeControls({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="duration" className="text-xs text-muted-foreground">
+            <Label className="text-xs text-muted-foreground">
               <Localize i18n_default_text="Duration" />
             </Label>
-            <Input
-              id="duration"
-              type="number"
-              value={duration}
-              onChange={e => {
-                const val = parseInt(e.target.value, 10);
-                if (!isNaN(val)) onDurationChange(val);
-              }}
-              min={durationLimits.min}
-              max={durationLimits.max}
-              step={1}
-              labelRight={localize('Ticks')}
-            />
+            <div className="flex h-10 items-center justify-between rounded-md border border-input bg-background px-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 rounded-md disabled:opacity-30"
+                onClick={() => onDurationChange(Math.max(1, duration - 1))}
+                disabled={duration <= 1}
+                aria-label={localize('Decrease duration')}
+              >
+                −
+              </Button>
+              <span className="min-w-0 flex-1 text-center text-sm font-semibold tabular-nums">
+                {duration}{' '}
+                <span className="font-normal text-muted-foreground">{localize('Ticks')}</span>
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 rounded-md disabled:opacity-30"
+                onClick={() => onDurationChange(Math.min(10, duration + 1))}
+                disabled={duration >= 10}
+                aria-label={localize('Increase duration')}
+              >
+                +
+              </Button>
+            </div>
           </div>
         </div>
       )}
