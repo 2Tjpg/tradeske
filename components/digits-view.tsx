@@ -301,12 +301,25 @@ export function DigitsView({
             <TickChart
               data={tickHistory}
               symbol={activeSymbol?.underlying_symbol}
-              activeTail={chartTracking.activeTail}
-              activeProfit={chartTracking.activeProfit}
-              entry={chartTracking.entry}
-              payout={chartTracking.payout}
-              onDismissPayout={chartTracking.dismissResult}
             />
+            {chartTracking.hudMounted && chartTracking.hudProfit !== null && (
+              <div
+                className={`pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-bold shadow-lg ring-1 transition-opacity duration-300 sm:top-6 sm:px-5 sm:py-2.5 sm:text-base ${
+                  chartTracking.hudVisible
+                    ? 'opacity-100'
+                    : 'opacity-0'
+                } ${
+                  chartTracking.hudProfit > 0
+                    ? 'bg-emerald-100 text-emerald-700 ring-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:ring-emerald-800'
+                    : 'bg-rose-100 text-rose-700 ring-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:ring-rose-800'
+                }`}
+                role="status"
+                aria-live="polite"
+              >
+                {chartTracking.hudProfit > 0 ? '+' : '-'}
+                {Math.abs(chartTracking.hudProfit).toFixed(2)} USD
+              </div>
+            )}
           </div>
 
           <div className="relative z-10 shrink-0 border-t border-border bg-background/95 shadow-2xl backdrop-blur-xl">
