@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Ban, ChevronDown, ChevronUp } from 'lucide-react';
 import { Localize } from '@deriv-com/translations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -174,6 +174,10 @@ export function DigitsView({
   const isMobile = useIsMobile();
   const chartTracking = useTradeChartTracking(ws, isConnected, buyResult);
   const [isSheetExpanded, setIsSheetExpanded] = useState(true);
+
+  useEffect(() => {
+    if (phaseOneTradeUi && buyResult) clearBuyResult();
+  }, [buyResult, clearBuyResult, phaseOneTradeUi]);
   const { localize } = useAppTranslations();
   const digitTradeTypeOptions = getDigitTradeTypeOptions(localize);
 
@@ -304,7 +308,7 @@ export function DigitsView({
             />
             {chartTracking.hudMounted && chartTracking.hudProfit !== null && (
               <div
-                className={`pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-bold shadow-lg ring-1 transition-opacity duration-300 sm:top-6 sm:px-5 sm:py-2.5 sm:text-base ${
+                className={`pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-bold shadow-lg ring-1 transition-[color,background-color,border-color,opacity] duration-200 sm:top-6 sm:px-5 sm:py-2.5 sm:text-base ${
                   chartTracking.hudVisible
                     ? 'opacity-100'
                     : 'opacity-0'
@@ -417,6 +421,7 @@ export function DigitsView({
                 isAuthenticated={authState === 'authenticated'}
                 showContractMode={false}
                 showPrediction={false}
+                showFeedback={false}
                 bottomSheet
               />
               <div className="h-[env(safe-area-inset-bottom)]" />

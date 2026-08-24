@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import type { BuyResult, DerivWS } from '@deriv/core';
 
 interface OpenContractUpdate {
-    contract_id: number;
+    contract_id: number | string;
     profit?: number | string;
+    bid_price?: number | string;
+    buy_price?: number | string;
     is_sold?: number;
     is_expired?: number;
     status?: string;
@@ -66,12 +68,15 @@ export function useTradeChartTracking(
         const handleUpdate = (message: Record<string, unknown>) => {
             if (message.msg_type !== 'proposal_open_contract') return;
             const update = message.proposal_open_contract as OpenContractUpdate | undefined;
-            if (!update || update.contract_id !== contractId) return;
+            if (!update || numeric(update.contract_id) !== contractId) return;
 
-            const nextProfit = numeric(update.profit);
-            if (nextProfit !== null) {
-                setHudProfit(nextProfit > 0 ? nextProfit : -stakeRef.current);
-            }
+            const streamedProfit = numeric(update.profit);
+            const bidPrice = numeric(update.bid_price);
+            const buyPrice = numeric(update.buy_price) ?? stakeRef.current;
+            const nextProfit = bidPrice !== null
+                ? bidPrice - buyPrice
+                : streamedProfit;
+            if (nextProfit !== null) setHudProfit(nextProfit);
 
             const settled = !!update.is_sold || !!update.is_expired ||
                 ['settled', 'sold', 'won', 'lost'].includes(update.status ?? '');
