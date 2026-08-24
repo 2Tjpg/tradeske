@@ -34,15 +34,13 @@ export interface ChartPayout {
 
 interface UseTradeChartTrackingReturn {
     activeTail: TickPoint[];
-    tailColor: string;
+    activeProfit: number | null;
     entry: ChartEntry | null;
     payout: ChartPayout | null;
     dismissResult: () => void;
 }
 
 const BLUE = '#2563eb';
-const GREEN = '#16a34a';
-const RED = '#dc2626';
 
 function numeric(value: unknown): number | null {
     return typeof value === 'number' && Number.isFinite(value)
@@ -153,11 +151,11 @@ export function useTradeChartTracking(
 
     return {
         activeTail,
-        tailColor: isSettled ? BLUE : profit > 0 ? GREEN : RED,
+        activeProfit: contractId === null ? null : profit,
         entry,
         payout,
         dismissResult,
     };
 }
 
-export { BLUE, GREEN, RED };
+export { BLUE };

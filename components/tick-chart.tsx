@@ -26,7 +26,7 @@ interface TickChartProps {
   data: TickPoint[];
   symbol?: string;
   activeTail?: TickPoint[];
-  tailColor?: string;
+  activeProfit?: number | null;
   entry?: ChartMarker | null;
   payout?: { amount: number; isWin: boolean } | null;
   onDismissPayout?: () => void;
@@ -50,12 +50,13 @@ export function TickChart({
   data,
   symbol,
   activeTail = [],
-  tailColor = '#dc2626',
+  activeProfit = null,
   entry = null,
   payout = null,
   onDismissPayout,
 }: TickChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<'Area'> | null>(null);
   const tailSeriesRef = useRef<ISeriesApi<'Line'> | null>(null);
@@ -107,7 +108,7 @@ export function TickChart({
       crosshairMarkerBackgroundColor: '#ffffff',
     });
     const tailSeries = chart.addSeries(LineSeries, {
-      color: '#dc2626',
+      color: '#2563eb',
       lineWidth: 2,
       priceLineVisible: false,
       lastValueVisible: false,
@@ -191,7 +192,7 @@ export function TickChart({
         ]
       : [];
     tailSeries.setData(tailData);
-    tailSeries.applyOptions({ color: tailColor });
+    tailSeries.applyOptions({ color: '#2563eb' });
 
     if (entryLineRef.current) {
       series.removePriceLine(entryLineRef.current);
@@ -222,13 +223,37 @@ export function TickChart({
     } else {
       chart.timeScale().scrollToRealTime();
     }
-  }, [activeTail, data, entry, symbol, tailColor]);
+  }, [activeTail, data, entry, symbol]);
+
+  useEffect(() => {
+    const badge = badgeRef.current;
+    const chart = chartRef.current;
+    const series = seriesRef.current;
+    const lastTick = activeTail[activeTail.length - 1];
+    if (!badge || !chart || !series || activeProfit === null || !lastTick) {
+      if (badge) badge.style.display = 'none';
+      return;
+    }
+
+    const left = chart.timeScale().timeToCoordinate(lastTick.time as UTCTimestamp);
+    const top = series.priceToCoordinate(lastTick.value);
+    if (left === null || top === null) {
+      badge.style.display = 'none';
+      return;
+    }
+
+    badge.style.display = 'block';
+    badge.style.left = `${left}px`;
+    badge.style.top = `${top}px`;
+  }, [activeProfit, activeTail, data]);
 
   useEffect(() => {
     if (!payout || !onDismissPayout) return;
     const timeoutId = window.setTimeout(onDismissPayout, 3000);
     return () => window.clearTimeout(timeoutId);
   }, [onDismissPayout, payout]);
+
+  const isProfit = (activeProfit ?? 0) > 0;
 
   return (
     <div className="absolute inset-0">
@@ -238,6 +263,17 @@ export function TickChart({
         role="img"
         aria-label={symbol ? `Live price chart for ${symbol}` : 'Live price chart'}
       />
+      <div
+        ref={badgeRef}
+        className={`pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[calc(100%+10px)] rounded-md px-2 py-1 text-xs font-semibold shadow-md ${
+          isProfit ? 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:ring-emerald-800' : 'bg-rose-100 text-rose-700 ring-1 ring-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:ring-rose-800'
+        }`}
+        role="status"
+        aria-live="polite"
+        style={{ display: 'none' }}
+      >
+        {isProfit ? '+' : '-'}{Math.abs(activeProfit ?? 0).toFixed(2)} USD
+      </div>
       {payout && (
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-background/10">
           <div

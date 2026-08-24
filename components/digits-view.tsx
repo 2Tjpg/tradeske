@@ -302,7 +302,7 @@ export function DigitsView({
               data={tickHistory}
               symbol={activeSymbol?.underlying_symbol}
               activeTail={chartTracking.activeTail}
-              tailColor={chartTracking.tailColor}
+              activeProfit={chartTracking.activeProfit}
               entry={chartTracking.entry}
               payout={chartTracking.payout}
               onDismissPayout={chartTracking.dismissResult}
