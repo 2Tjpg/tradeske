@@ -172,7 +172,13 @@ export function DigitsView({
   onReorder,
 }: DigitsViewProps) {
   const isMobile = useIsMobile();
-  const chartTracking = useTradeChartTracking(ws, isConnected, buyResult);
+  const chartTracking = useTradeChartTracking(
+    ws,
+    isConnected,
+    buyResult,
+    contractMode,
+    selectedDigit
+  );
   const [isSheetExpanded, setIsSheetExpanded] = useState(true);
 
   useEffect(() => {
@@ -310,7 +316,9 @@ export function DigitsView({
             />
             {chartTracking.hudMounted && chartTracking.hudProfit !== null && (
               <div
-                className={`pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-bold shadow-lg ring-1 transition-[color,background-color,border-color,opacity] duration-200 sm:top-6 sm:px-5 sm:py-2.5 sm:text-base ${
+                className={`pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-bold shadow-lg ring-1 transition-[color,background-color,border-color,opacity,transform] duration-300 sm:top-6 sm:px-5 sm:py-2.5 sm:text-base ${
+                  chartTracking.hudSettled ? 'scale-110' : 'scale-100'
+                } ${
                   chartTracking.hudVisible
                     ? 'opacity-100'
                     : 'opacity-0'
