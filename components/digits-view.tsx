@@ -309,7 +309,7 @@ export function DigitsView({
             </div>
           </div>
 
-          <div className="relative min-h-0 flex-1">
+          <div className={isSheetExpanded ? 'hidden' : 'relative min-h-0 flex-1'}>
             <TickChart
               data={tickHistory}
               symbol={activeSymbol?.underlying_symbol}
@@ -341,7 +341,11 @@ export function DigitsView({
             )}
           </div>
 
-          <div className="relative z-10 shrink-0 border-t border-border bg-background/95 shadow-2xl backdrop-blur-xl">
+          <div
+            className={`relative z-10 border-t border-border bg-background/95 shadow-2xl backdrop-blur-xl ${
+              isSheetExpanded ? 'min-h-0 flex-1 overflow-y-auto' : 'shrink-0'
+            }`}
+          >
             <button
               type="button"
               onClick={() => setIsSheetExpanded(expanded => !expanded)}
@@ -357,9 +361,9 @@ export function DigitsView({
             </button>
 
             <div
-              className={`overflow-hidden px-3 transition-[max-height,opacity,transform] duration-300 ease-out motion-reduce:transition-none sm:px-5 ${
+              className={`flex min-h-0 flex-col overflow-hidden px-3 transition-[max-height,opacity,transform] duration-300 ease-out motion-reduce:transition-none sm:px-5 ${
                 isSheetExpanded
-                  ? 'max-h-[min(22rem,45vh)] translate-y-0 opacity-100'
+                  ? 'max-h-none flex-1 translate-y-0 overflow-y-auto opacity-100'
                   : 'pointer-events-none max-h-0 -translate-y-2 opacity-0'
               }`}
               aria-hidden={!isSheetExpanded}
@@ -408,7 +412,7 @@ export function DigitsView({
               />
             </div>
 
-            <div className="px-3 pb-3 sm:px-5">
+            <div className={`px-3 pb-3 sm:px-5 ${isSheetExpanded ? 'pt-6 sm:pt-8' : ''}`}>
               <TradeControls
                 tradeType={tradeType}
                 contractMode={contractMode}
