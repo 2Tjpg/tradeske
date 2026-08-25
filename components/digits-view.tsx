@@ -316,8 +316,8 @@ export function DigitsView({
             />
             {chartTracking.hudMounted && chartTracking.hudProfit !== null && (
               <div
-                className={`pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-bold shadow-lg ring-1 transition-[color,background-color,border-color,opacity,transform] duration-300 sm:top-6 sm:px-5 sm:py-2.5 sm:text-base ${
-                  chartTracking.hudSettled ? 'scale-110' : 'scale-100'
+                className={`pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-bold shadow-lg ring-1 transition-[color,background-color,border-color,opacity,transform] duration-200 motion-reduce:transition-none sm:top-6 sm:px-5 sm:py-2.5 sm:text-base ${
+                  chartTracking.hudSettled ? 'scale-125' : 'scale-100'
                 } ${
                   chartTracking.hudVisible
                     ? 'opacity-100'
@@ -330,6 +330,11 @@ export function DigitsView({
                 role="status"
                 aria-live="polite"
               >
+                {chartTracking.hudSettled && (
+                  <>
+                    <Localize i18n_default_text="Payout" />{' '}
+                  </>
+                )}
                 {chartTracking.hudProfit > 0 ? '+' : '-'}
                 {Math.abs(chartTracking.hudProfit).toFixed(2)} USD
               </div>

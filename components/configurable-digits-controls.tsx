@@ -999,7 +999,11 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
       {config.order.map((key) => {
         const content = renderers[key]();
         if (content === null) return null;
-        return <div key={key}>{content}</div>;
+        return (
+          <div key={key} className={key === 'buy' ? 'pt-2 sm:pt-1' : undefined}>
+            {content}
+          </div>
+        );
       })}
       {isAuthenticated && (
         <Button asChild variant="ghost" className="w-full text-sm text-muted-foreground hover:text-foreground">

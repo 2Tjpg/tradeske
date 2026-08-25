@@ -199,7 +199,7 @@ export function TradeControls({
       )}
 
       {showStakeDuration && (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="stake" className="text-xs text-muted-foreground">
               <Localize i18n_default_text="Stake" />
@@ -291,7 +291,13 @@ export function TradeControls({
 
       {/* Single buy action follows the selected contract toggle. */}
       {showBuy && (
-        <div className={bottomSheet ? 'static' : 'max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static'}>
+        <div
+          className={`${showStakeDuration ? 'pt-2 sm:pt-1' : ''} ${
+            bottomSheet
+              ? 'static'
+              : 'max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static'
+          }`}
+        >
           <Button
             className="h-10 w-full rounded-full px-6 sm:h-11 sm:px-8"
             disabled={!isConnected || !activeProposal || isBuying}
