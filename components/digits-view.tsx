@@ -17,6 +17,7 @@ import { TradeTypeChips } from '@/components/custom/trade-type-chips';
 import { SymbolSelector } from '@/components/custom/symbol-selector';
 import { ThemeToggle } from '@/components/custom/theme-toggle';
 import { TickChart } from './tick-chart';
+import { LivePayoutBadge } from './live-payout-badge';
 import { useTradeChartTracking } from '@/hooks/use-trade-chart-tracking';
 import type { DerivWS } from '@deriv/core';
 import type {
@@ -314,31 +315,13 @@ export function DigitsView({
               data={tickHistory}
               symbol={activeSymbol?.underlying_symbol}
             />
-            {chartTracking.hudMounted && chartTracking.hudProfit !== null && (
-              <div
-                className={`pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-4 py-2 text-sm font-bold shadow-lg ring-1 transition-[color,background-color,border-color,opacity,transform] duration-200 motion-reduce:transition-none sm:top-6 sm:px-5 sm:py-2.5 sm:text-base ${
-                  chartTracking.hudSettled ? 'scale-125' : 'scale-100'
-                } ${
-                  chartTracking.hudVisible
-                    ? 'opacity-100'
-                    : 'opacity-0'
-                } ${
-                  chartTracking.hudProfit > 0
-                    ? 'bg-emerald-100 text-emerald-700 ring-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:ring-emerald-800'
-                    : 'bg-rose-100 text-rose-700 ring-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:ring-rose-800'
-                }`}
-                role="status"
-                aria-live="polite"
-              >
-                {chartTracking.hudSettled && (
-                  <>
-                    <Localize i18n_default_text="Payout" />{' '}
-                  </>
-                )}
-                {chartTracking.hudProfit > 0 ? '+' : '-'}
-                {Math.abs(chartTracking.hudProfit).toFixed(2)} USD
-              </div>
-            )}
+            <LivePayoutBadge
+              profit={chartTracking.hudProfit}
+              mounted={chartTracking.hudMounted && !isSheetExpanded}
+              visible={chartTracking.hudVisible}
+              settled={chartTracking.hudSettled}
+              className="absolute left-1/2 top-4 -translate-x-1/2 sm:top-6"
+            />
           </div>
 
           <div
@@ -346,19 +329,29 @@ export function DigitsView({
               isSheetExpanded ? 'min-h-0 flex-1 overflow-y-auto' : 'shrink-0'
             }`}
           >
-            <button
-              type="button"
-              onClick={() => setIsSheetExpanded(expanded => !expanded)}
-              aria-expanded={isSheetExpanded}
-              aria-label={isSheetExpanded ? 'Collapse digit predictions' : 'Expand digit predictions'}
-              className="mx-auto flex h-8 w-14 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            >
-              {isSheetExpanded ? (
-                <ChevronDown className="h-5 w-5" aria-hidden="true" />
-              ) : (
-                <ChevronUp className="h-5 w-5" aria-hidden="true" />
-              )}
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsSheetExpanded(expanded => !expanded)}
+                aria-expanded={isSheetExpanded}
+                aria-label={isSheetExpanded ? 'Collapse digit predictions' : 'Expand digit predictions'}
+                className="mx-auto flex h-8 w-14 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                {isSheetExpanded ? (
+                  <ChevronDown className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <ChevronUp className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
+              <LivePayoutBadge
+                profit={chartTracking.hudProfit}
+                mounted={chartTracking.hudMounted && isSheetExpanded}
+                visible={chartTracking.hudVisible}
+                settled={chartTracking.hudSettled}
+                compact
+                className="absolute right-4 top-1/2 -translate-y-1/2"
+              />
+            </div>
 
             <div
               className={`flex min-h-0 flex-col overflow-hidden px-3 transition-[max-height,opacity,transform] duration-300 ease-out motion-reduce:transition-none sm:px-5 ${
