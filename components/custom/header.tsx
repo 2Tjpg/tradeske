@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Localize } from '@deriv-com/translations';
 import { Menu, X } from 'lucide-react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -172,6 +173,12 @@ export function Header({
           </Popover>
         )}
         <div className="hidden items-center gap-2 md:flex">
+          <Link
+            href="/reports"
+            className="inline-flex h-10 items-center rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <Localize i18n_default_text="Positions" />
+          </Link>
           {isAuthenticated ? (
             <Button variant="outline" onClick={onLogout}>
               <Localize i18n_default_text="Log out" />
@@ -209,7 +216,14 @@ export function Header({
               {actions}
               <LanguageSwitcher />
             </div>
-            <div className="pt-2">
+            <div className="space-y-2 pt-2">
+              <Link
+                href="/reports"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex h-10 w-full items-center rounded-md px-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              >
+                <Localize i18n_default_text="Positions" />
+              </Link>
               {isAuthenticated ? (
                 <Button variant="outline" className="w-full justify-start" onClick={() => { onLogout(); setMobileMenuOpen(false); }}>
                   <Localize i18n_default_text="Log out" />

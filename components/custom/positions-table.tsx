@@ -87,9 +87,8 @@ export function PositionsTable({
   return (
     <div className={cn('mt-6', className)}>
       {/* Header */}
-      <div className="grid grid-cols-3 items-center mb-3">
-        <div />
-        <h2 className="text-sm font-semibold text-center">
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <h2 className="text-base font-semibold">
           <Localize i18n_default_text="Report" />
         </h2>
         <Select value={filter} onValueChange={(value) => setFilter(value as PositionFilter)}>

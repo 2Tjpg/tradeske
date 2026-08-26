@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-import Link from 'next/link';
 import { Localize } from '@deriv-com/translations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -306,13 +305,6 @@ export function TradeControls({
         </div>
       )}
 
-      {isAuthenticated && !bottomSheet && showBuy && (
-        <Button asChild variant="ghost" className="w-full text-sm text-muted-foreground hover:text-foreground">
-          <Link href="/reports">
-            <Localize i18n_default_text="View your positions →" />
-          </Link>
-        </Button>
-      )}
     </div>
   );
 }

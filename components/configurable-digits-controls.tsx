@@ -20,7 +20,6 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { GripVertical, LineChart } from 'lucide-react';
 import { toast } from 'sonner';
 import { Localize } from '@deriv-com/translations';
@@ -1005,13 +1004,6 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           </div>
         );
       })}
-      {isAuthenticated && (
-        <Button asChild variant="ghost" className="w-full text-sm text-muted-foreground hover:text-foreground">
-          <Link href="/reports">
-            <Localize i18n_default_text="View your positions →" />
-          </Link>
-        </Button>
-      )}
     </div>
   );
 }

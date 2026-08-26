@@ -1,6 +1,7 @@
 'use client';
 
 import { Localize } from '@deriv-com/translations';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { ClosedPosition } from '@/hooks/use-closed-positions';
 import { getSymbolDisplayName } from '@/lib/active-symbols-display-names';
@@ -42,21 +43,20 @@ export function ClosedPositionCard({
 
   return (
     <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-      {/* Row 1: Symbol + Direction */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-muted rounded px-1.5 py-0.5">
-            <span className="text-xs font-bold text-foreground">
-              {pos.underlying_symbol}
-            </span>
+      {/* Row 1: Contract identity + Asset */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="secondary" className="max-w-full truncate rounded-md px-2 py-0.5 font-mono text-[11px]">
+              ID: {pos.contract_id}
+            </Badge>
+            <span className="text-sm font-semibold text-foreground">{getSymbolDisplayName(pos.underlying_symbol)}</span>
           </div>
-          <span className="text-sm font-semibold text-foreground leading-tight">
-            {getSymbolDisplayName(pos.underlying_symbol)}
-          </span>
+          <p className="mt-1 text-xs text-muted-foreground">{dirLabel}</p>
         </div>
-        <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-          <span>{dirLabel}</span>
-        </div>
+        <Badge variant="outline" className="shrink-0 text-xs px-2 py-0.5 rounded-md font-medium">
+          {pos.underlying_symbol}
+        </Badge>
       </div>
 
       {/* Duration */}

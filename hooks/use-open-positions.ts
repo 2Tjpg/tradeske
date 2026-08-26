@@ -3,6 +3,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { DerivWS } from '@deriv/core';
 
+interface PortfolioResponse {
+  portfolio?: {
+    contracts?: OpenPosition[];
+  };
+}
+
 export interface OpenPosition {
   contract_id: number;
   contract_type: string;
@@ -72,6 +78,21 @@ export function useOpenPositions(
     // Capture ref value at effect time so the cleanup closure has a stable reference
     const timers = removalTimers.current;
 
+    // Seed the list from the authenticated account portfolio so the report is
+    // populated immediately, then keep it current with open-contract streams.
+    ws.send<PortfolioResponse>({ portfolio: 1 })
+      .then(response => {
+        const contracts = response.portfolio?.contracts ?? [];
+        setPositions(prev => {
+          const liveById = new Map(prev.map(position => [position.contract_id, position]));
+          contracts.forEach(contract => {
+            liveById.set(contract.contract_id, { ...contract, ...liveById.get(contract.contract_id) });
+          });
+          return Array.from(liveById.values());
+        });
+      })
+      .catch(() => { });
+
     // Use global message listener — each open contract has its own subscription.id
     // so we can't use ws.subscribe() for all of them; onMessage catches everything.
     const unsubscribeListener = ws.onMessage((data) => {
@@ -99,7 +120,7 @@ export function useOpenPositions(
     // each with its own subscription.id for live updates.
     ws.send({ proposal_open_contract: 1, subscribe: 1 })
       .then(() => { isSubscribedRef.current = true; })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       unsubscribeListener();
@@ -110,7 +131,7 @@ export function useOpenPositions(
       // Cancel all open-contract streams on the server so the next mount
       // can re-subscribe without hitting AlreadySubscribed.
       if (isSubscribedRef.current && ws.isConnected) {
-        ws.send({ forget_all: 'proposal_open_contract' }).catch(() => {});
+        ws.send({ forget_all: 'proposal_open_contract' }).catch(() => { });
       }
       isSubscribedRef.current = false;
     };
