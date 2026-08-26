@@ -176,7 +176,7 @@ export function TradeControls({
     : localize('Buy @ {{stake}} USD', { stake: (parseFloat(stake) || 0).toFixed(2) });
 
   return (
-    <div className="space-y-2 sm:space-y-4">
+    <div className="space-y-1.5 sm:space-y-3">
       {showContractMode && (
         <ToggleGroup
           type="single"
@@ -208,6 +208,7 @@ export function TradeControls({
               id="stake"
               type="number"
               value={stake}
+              className="h-12 !text-lg"
               onChange={e => onStakeChange(e.target.value)}
               onKeyDown={e => {
                 if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
@@ -221,19 +222,19 @@ export function TradeControls({
             <Label className="text-xs text-muted-foreground">
               <Localize i18n_default_text="Duration" />
             </Label>
-            <div className="flex h-10 items-center justify-between rounded-md border border-input bg-background px-1">
+            <div className="flex h-12 items-center justify-between rounded-md border border-input bg-background px-1">
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 shrink-0 rounded-md disabled:opacity-30"
+                className="h-full w-12 shrink-0 rounded-md text-lg disabled:opacity-30"
                 onClick={() => onDurationChange(Math.max(1, duration - 1))}
                 disabled={duration <= 1}
                 aria-label={localize('Decrease duration')}
               >
                 −
               </Button>
-              <span className="min-w-0 flex-1 text-center text-sm font-semibold tabular-nums">
+              <span className="min-w-0 flex-1 text-center text-lg font-semibold tabular-nums">
                 {duration}{' '}
                 <span className="font-normal text-muted-foreground">{localize('Ticks')}</span>
               </span>
@@ -241,7 +242,7 @@ export function TradeControls({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 shrink-0 rounded-md disabled:opacity-30"
+                className="h-full w-12 shrink-0 rounded-md text-lg disabled:opacity-30"
                 onClick={() => onDurationChange(Math.min(10, duration + 1))}
                 disabled={duration >= 10}
                 aria-label={localize('Increase duration')}
@@ -292,7 +293,7 @@ export function TradeControls({
       {/* Single buy action follows the selected contract toggle. */}
       {showBuy && (
         <div
-          className={`${showStakeDuration ? 'pt-2 sm:pt-1' : ''} ${
+          className={`${showStakeDuration ? 'pt-4 sm:pt-5' : ''} ${
             bottomSheet
               ? 'static'
               : 'max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+2.5rem)] max-lg:left-3 max-lg:right-3 lg:static'

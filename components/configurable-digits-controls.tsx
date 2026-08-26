@@ -612,6 +612,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         id="stake"
         type="number"
         value={stake}
+        className={cn('h-12 !text-lg', extraClass)}
         onChange={(event) => onStakeChange(event.target.value)}
         onKeyDown={(event) => {
           if (['e', 'E', '+', '-'].includes(event.key)) event.preventDefault();
@@ -619,7 +620,6 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
         min={0}
         step="0.01"
         labelRight="USD"
-        className={extraClass}
       />
     );
 
@@ -676,19 +676,19 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   const renderDuration = () => {
     const setDurationNum = (amount: number) => onDurationChange(Math.min(10, Math.max(1, amount)));
     const durationStepper = () => (
-      <div className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-1">
+      <div className="flex h-12 w-full items-center justify-between rounded-md border border-input bg-background px-1">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="h-8 w-8 shrink-0 rounded-md disabled:opacity-30"
+          className="h-full w-12 shrink-0 rounded-md text-lg disabled:opacity-30"
           onClick={() => setDurationNum(duration - 1)}
           disabled={duration <= 1}
           aria-label={localize('Decrease duration')}
         >
           −
         </Button>
-        <span className="min-w-0 flex-1 text-center text-sm font-semibold tabular-nums">
+        <span className="min-w-0 flex-1 text-center text-lg font-semibold tabular-nums">
           {duration}{' '}
           <span className="font-normal text-muted-foreground">{localize('Ticks')}</span>
         </span>
@@ -696,7 +696,7 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
           type="button"
           variant="ghost"
           size="icon"
-          className="h-8 w-8 shrink-0 rounded-md disabled:opacity-30"
+          className="h-full w-12 shrink-0 rounded-md text-lg disabled:opacity-30"
           onClick={() => setDurationNum(duration + 1)}
           disabled={duration >= 10}
           aria-label={localize('Increase duration')}
@@ -995,12 +995,12 @@ export function ConfigurableDigitsControls(props: ConfigurableDigitsControlsProp
   }
 
   return (
-    <div className="w-full space-y-3 lg:space-y-4">
+    <div className="w-full space-y-2 lg:space-y-3">
       {config.order.map((key) => {
         const content = renderers[key]();
         if (content === null) return null;
         return (
-          <div key={key} className={key === 'buy' ? 'pt-2 sm:pt-1' : undefined}>
+          <div key={key} className={key === 'buy' ? 'pt-4 sm:pt-5' : undefined}>
             {content}
           </div>
         );
