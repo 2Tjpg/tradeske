@@ -37,7 +37,6 @@ interface TradeControlsProps {
   isDiffersProposalLoading: boolean;
   onBuy: () => void;
   onBuyMode: (mode: 'DIGITMATCH' | 'DIGITDIFF') => void;
-  onBuyStarted?: () => void;
   isBuying: boolean;
   buyResult: BuyResult | null;
   buyError: string | null;
@@ -113,7 +112,6 @@ export function TradeControls({
   isDiffersProposalLoading,
   onBuy,
   onBuyMode,
-  onBuyStarted,
   isBuying,
   buyResult,
   buyError,
@@ -164,7 +162,6 @@ export function TradeControls({
       : isDiffersProposalLoading
     : isProposalLoading;
   const buyActiveContract = () => {
-    onBuyStarted?.();
     if (isMatchesDiffers) {
       onBuyMode(contractMode === 'DIGITMATCH' ? 'DIGITMATCH' : 'DIGITDIFF');
     } else {
